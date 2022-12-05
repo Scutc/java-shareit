@@ -3,7 +3,9 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.CustomSecurityException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -23,7 +25,7 @@ public class ItemService {
         log.info("Получение товара с ID = {}", itemId);
         Item item = itemDao.getItemById(itemId);
         if (item == null) {
-            throw new EntityNotFoundException("Товар с ID " + itemId + " не найден");
+            throw new ItemNotFoundException(itemId);
         }
         return ItemMapper.toItemDto(item);
     }
@@ -36,7 +38,7 @@ public class ItemService {
                     .collect(Collectors.toList());
     }
 
-    public ItemDto createItem(Long userId, ItemDto itemDto) throws EntityNotFoundException {
+    public ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException {
         log.info("Создание нового товара {}", itemDto);
         userService.getUserById(userId);
         itemDto.setUserId(userId);
@@ -44,11 +46,11 @@ public class ItemService {
         return ItemMapper.toItemDto(item);
     }
 
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws EntityNotFoundException {
+    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws CustomSecurityException {
         log.info("Обновление товара");
         userService.getUserById(userId);
         if (!itemDao.getItemById(itemId).getUserId().equals(userId)) {
-            throw new EntityNotFoundException("Некорректное значение ID пользователя. Данные не обновлены!");
+            throw new CustomSecurityException("У пользователя отсутствуют права на изменение товара!");
         }
         Item itemForUpdate = itemDao.updateItem(itemId, ItemMapper.toItem(itemDto));
         return ItemMapper.toItemDto(itemForUpdate);

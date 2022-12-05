@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -23,7 +23,7 @@ public class UserService {
         if (user != null) {
             return UserMapper.toUserDto(user);
         } else {
-            throw new EntityNotFoundException("Пользователь с ID " + userId + " не найден");
+            throw new UserNotFoundException(userId);
         }
     }
 
