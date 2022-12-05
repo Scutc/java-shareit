@@ -54,7 +54,7 @@ class ShareItTests {
     @Test
     @Order(4)
     public void testDeleteUser() {
-        userDao.deleteUser(1l);
+        userDao.deleteUser(1L);
         assertThat(userDao.getAllUsers().size() == 0);
     }
 

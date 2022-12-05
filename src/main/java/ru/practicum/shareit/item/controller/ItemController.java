@@ -31,15 +31,13 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId
-            , @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
         log.info("Поступил запрос на создание товара");
         return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId
-            , @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         log.info("Получен запрос на обновление товара с ID {}", itemId);
         return itemService.updateItem(userId, itemId, itemDto);
     }

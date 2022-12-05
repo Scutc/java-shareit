@@ -20,8 +20,8 @@ public class ErrorHandler {
     @ResponseBody
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e
             , HttpServletRequest request) {
-        log.warn("Ошибка валидации полей объекта: {} {}. Путь запроса {}", e.getFieldError().getField()
-                , e.getFieldError().getDefaultMessage(), request.getServletPath());
+        log.warn("Ошибка валидации полей объекта: {} {}. Путь запроса {}", e.getFieldError().getField(),
+                e.getFieldError().getDefaultMessage(), request.getServletPath());
         return new ResponseEntity<>("Ошибка валидации полей объекта: " + e.getFieldError().getField()
                 + " " + e.getFieldError().getDefaultMessage() + ". Путь запроса "
                 + request.getServletPath(), HttpStatus.BAD_REQUEST);
