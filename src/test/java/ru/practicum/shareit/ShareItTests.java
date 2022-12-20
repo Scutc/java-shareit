@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.model.User;

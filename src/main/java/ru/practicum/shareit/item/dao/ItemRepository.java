@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    Item getItemByIdIs(Long itemId);
+    Item getItemById(Long itemId);
 
  //   Set<Item> getItemsByUserWithin(Long userId);
 

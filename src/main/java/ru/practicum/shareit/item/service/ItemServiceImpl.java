@@ -10,10 +10,9 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
+import ru.practicum.shareit.user.service.IUserService;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +20,11 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements IItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final IUserService userService;
 
     public ItemDto getItemById(Long itemId) {
         log.info("Получение товара с ID = {}", itemId);
-        Item item = itemRepository.getItemByIdIs(itemId);
+        Item item = itemRepository.getItemById(itemId);
         if (item == null) {
             throw new ItemNotFoundException(itemId);
         }
@@ -42,20 +42,19 @@ public class ItemServiceImpl implements IItemService {
 
     public ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException {
         log.info("Создание нового товара {}", itemDto);
-        userRepository.getUserById(userId);
-        itemDto.setUserId(userId);
+        userService.getUserById(userId);
         Item item = itemRepository.save(toItem(itemDto));
         return toItemDto(item);
     }
 
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws CustomSecurityException {
         log.info("Обновление товара");
-        userRepository.getUserById(userId);
-        if (!itemRepository.getItemByIdIs(itemId).getUser().getId().equals(userId)) {
+        userService.getUserById(userId);
+        if (!itemRepository.getItemById(itemId).getOwnerId().equals(userId)) {
             throw new CustomSecurityException("У пользователя отсутствуют права на изменение товара!");
         }
         Item itemForUpdate = itemRepository.save(toItem(itemDto));
-        return toItemDto(itemForUpdate);
+        return null;
     }
 
     public List<ItemDto> searchItem(String searchText) {
@@ -73,8 +72,8 @@ public class ItemServiceImpl implements IItemService {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getIsAvailable(),
-                item.getUser().getId()
+                item.getAvailable(),
+                item.getOwnerId()
         );
     }
 
@@ -83,8 +82,7 @@ public class ItemServiceImpl implements IItemService {
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.getIsAvailable(),
-                userRepository.getUserById(itemDto.getUserId())
-        );
+                itemDto.getAvailable(),
+                itemDto.getUserId());
     }
 }

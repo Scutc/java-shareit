@@ -25,7 +25,4 @@ public class User {
 
     @Column(name = "email", nullable = false)
     private String email;
-
-    @OneToMany(mappedBy ="user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Item> Items;
 }
