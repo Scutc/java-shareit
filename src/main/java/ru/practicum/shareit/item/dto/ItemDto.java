@@ -15,6 +15,6 @@ public class ItemDto {
     @NotBlank
     private String description;
     @NotNull
-    private Boolean available;
+    private Boolean isAvailable;
     private Long userId;
 }
