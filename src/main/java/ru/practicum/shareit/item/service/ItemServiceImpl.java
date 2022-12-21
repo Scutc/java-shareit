@@ -73,11 +73,9 @@ public class ItemServiceImpl implements IItemService {
 
     public List<ItemDto> searchItem(String searchText) {
         log.info("Поиск товара по строке {}", searchText);
-  /*      List<Item> items = itemRepository.searchItem(searchText);
+        List<Item> items = itemRepository.searchItem(searchText);
         return items.stream()
-                    .map(this::toItemDto)
-                    .collect(Collectors.toList());*/
-
-        return null;
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
     }
 }

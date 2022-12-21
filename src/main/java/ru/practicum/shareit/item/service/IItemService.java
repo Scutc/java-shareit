@@ -16,6 +16,4 @@ public interface IItemService {
     ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws CustomSecurityException;
 
     List<ItemDto> searchItem(String searchText);
-
-
 }

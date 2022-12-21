@@ -8,6 +8,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.IItemService;
 
 import javax.validation.Valid;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -44,7 +46,10 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> serachItems(@RequestParam String text) {
-        log.info("Получена запрос на поиск товаров по тексту \"{}\"", text);
+        log.info("Получен запрос на поиск товаров по тексту \"{}\"", text);
+        if (text.isBlank()) {
+            return Collections.EMPTY_LIST;
+        }
         return itemService.searchItem(text);
     }
 }
