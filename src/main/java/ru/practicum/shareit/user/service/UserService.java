@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-
+import static ru.practicum.shareit.user.service.UserMapper.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class UserService implements IUserService {
         log.info("Получение пользователя по ID = {}", userId);
         User user = userRepository.getUserById(userId);
         if (user != null) {
-            return UserMapper.toUserDto(user);
+            return toUserDto(user);
         } else {
             throw new UserNotFoundException(userId);
         }
@@ -37,17 +38,19 @@ public class UserService implements IUserService {
                     .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserDto createUser(UserDto userDto) {
         log.info("Создание нового пользователя {}", userDto);
         try {
-            User user = userRepository.save(UserMapper.toUser(userDto));
-            return UserMapper.toUserDto(user);
+            User user = userRepository.save(toUser(userDto));
+            return toUserDto(user);
         } catch (DataIntegrityViolationException e) {
             log.warn("Пользователь с такими данными уже существует в базе!");
             throw new DuplicateDataException("Пользователь с такими данными уже существует в базе!");
         }
     }
 
+    @Transactional
     public UserDto updateUser(Long userId, UserDto userDto) {
         log.info("Обновление пользователя с ID = {}", userId);
         User userForUpdate = userRepository.getUserById(userId);
@@ -63,9 +66,10 @@ public class UserService implements IUserService {
             log.warn("Пользователь с такими данными уже существует в базе!");
             throw new DuplicateDataException("Пользователь с такими данными уже существует в базе!");
         }
-        return UserMapper.toUserDto(userForUpdate);
+        return toUserDto(userForUpdate);
     }
 
+    @Transactional
     public boolean deleteUser(Long userId) {
         User userForDelete = userRepository.getUserById(userId);
         if (userForDelete != null) {
