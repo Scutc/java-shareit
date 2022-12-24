@@ -13,9 +13,7 @@ public interface IBookingService {
 
     List<Booking> getBookingsByUser(Long userId, BookingStatus state);
 
-    Booking getBookingById(Long bookingId);
-
-    Booking getBookingByIdAndUser(Long bookingId, Long userId);
+    Booking getBookingById(Long bookingId, Long userId);
 
     List<Booking> getBookingByOwner(Long ownerId, BookingStatus state);
 }

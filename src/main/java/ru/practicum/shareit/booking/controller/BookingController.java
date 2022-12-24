@@ -37,9 +37,10 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public Booking getBookingById(@PathVariable Long bookingId) {
+    public Booking getBookingById(@PathVariable Long bookingId,
+                                  @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Поступил запрос на получение бронирования с ID = " + bookingId);
-        return bookingService.getBookingById(bookingId);
+        return bookingService.getBookingById(bookingId, userId);
     }
 
     @GetMapping("/owner")
@@ -52,6 +53,7 @@ public class BookingController {
     @GetMapping()
     public List<Booking> getAllBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                        @RequestParam(required = false) BookingStatus state) {
+        log.info("Поступил запрос на получение всех бронирований");
         return bookingService.getBookingsByUser(userId, state);
     }
 }

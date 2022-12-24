@@ -10,15 +10,15 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.IItemService;
 import ru.practicum.shareit.item.service.ItemMapper;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.IUserService;
 import ru.practicum.shareit.user.service.UserMapper;
 
-import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class BookingServiceImpl implements IBookingService {
+    private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final IItemService itemService;
     private final IUserService userService;
@@ -41,6 +42,9 @@ public class BookingServiceImpl implements IBookingService {
         if (!checkBookingDates(bookingDto)) {
             throw new NotValidDateException();
         }
+        if (itemDto.getUserId() == userId) {
+            throw new EntityNotFoundException("Нельзя забронировать собственную вещь!");
+        }
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(UserMapper.toUser(userDto));
         booking.setItem(ItemMapper.toItem(itemDto));
@@ -50,7 +54,18 @@ public class BookingServiceImpl implements IBookingService {
     @Transactional
     @Override
     public Booking updateBookingStatus(Long userId, Long bookingId, Boolean newStatus) {
-        Booking booking = bookingRepository.findBookingById(bookingId);
+        Booking booking = bookingRepository.findBookingById(bookingId, userId);
+        if (booking == null) {
+            throw new NotAllowedToChangeException("Бронирование соответствующее условию запроса не найдено");
+        }
+        booking = bookingRepository.findBookingByIdOwner(bookingId, userId);
+        if (booking == null) {
+            throw new EntityNotFoundException("У пользователя " + userId +
+                    " Отсутствуют права на изменение статуса бронирования " + bookingId);
+        }
+        if (booking.getStatus().equals(BookingStatus.APPROVED) && newStatus)  {
+            throw new NotAllowedToChangeException("Бронирование нельзя подтвердить повторно!");
+        }
         if (newStatus) {
             booking.setStatus(BookingStatus.APPROVED);
         } else {
@@ -65,13 +80,8 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public Booking getBookingByIdAndUser(Long bookingId, Long userId) {
-        return bookingRepository.findBookingsByIdAndBooker_Id(bookingId, userId);
-    }
-
-    @Override
-    public Booking getBookingById(Long bookingId) {
-        Booking booking = bookingRepository.findBookingById(bookingId);
+    public Booking getBookingById(Long bookingId, Long userId) {
+        Booking booking = bookingRepository.findBookingById(bookingId, userId);
         if (booking == null) {
             throw new EntityNotFoundException("Брониронивание с ID " + bookingId + " не найдено");
         }

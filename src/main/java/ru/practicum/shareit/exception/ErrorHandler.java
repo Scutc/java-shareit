@@ -90,4 +90,11 @@ public class ErrorHandler {
         log.warn("Unknown state: UNSUPPORTED_STATUS");
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler
+    public ResponseEntity<String> NotAllowedToChangeException(NotAllowedToChangeException e, HttpServletRequest request) {
+        log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
+        return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
+                + request.getServletPath(), HttpStatus.BAD_REQUEST);
+    }
 }

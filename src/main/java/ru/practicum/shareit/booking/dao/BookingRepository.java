@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    Booking findBookingById(Long bookingId);
+    @Query("SELECT b FROM Booking b WHERE b.id =?1 AND (b.booker.id =?2 OR b.item.ownerId =?2)")
+    Booking findBookingById(Long bookingId, Long userId);
 
-    Booking findBookingsByIdAndBooker_Id(Long bookingId, Long userId);
+    @Query("SELECT b FROM Booking b WHERE b.id =?1 AND b.item.ownerId =?2")
+    Booking findBookingByIdOwner(Long bookingId, Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 ORDER BY b.id DESC")
     List<Booking> getBookingsByBooker(Long userId);
