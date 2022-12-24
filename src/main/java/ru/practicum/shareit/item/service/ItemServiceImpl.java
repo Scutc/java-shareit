@@ -24,6 +24,7 @@ public class ItemServiceImpl implements IItemService {
     private final ItemRepository itemRepository;
     private final IUserService userService;
 
+    @Override
     public ItemDto getItemById(Long itemId) {
         log.info("Получение товара с ID = {}", itemId);
         Item item = itemRepository.getItemById(itemId);
@@ -33,6 +34,7 @@ public class ItemServiceImpl implements IItemService {
         return toItemDto(item);
     }
 
+    @Override
     public List<ItemDto> getAllItems(Long userId) {
         log.info("Получение всех товаров");
         Set<Item> items = itemRepository.getAllByOwnerId(userId);
@@ -42,6 +44,7 @@ public class ItemServiceImpl implements IItemService {
     }
 
     @Transactional
+    @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException {
         log.info("Создание нового товара {}", itemDto);
         userService.getUserById(userId);
@@ -51,6 +54,7 @@ public class ItemServiceImpl implements IItemService {
     }
 
     @Transactional
+    @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws CustomSecurityException {
         log.info("Обновление товара");
         userService.getUserById(userId);
@@ -71,6 +75,7 @@ public class ItemServiceImpl implements IItemService {
         return toItemDto(itemForUpdate);
     }
 
+    @Override
     public List<ItemDto> searchItem(String searchText) {
         log.info("Поиск товара по строке {}", searchText);
         List<Item> items = itemRepository.searchItem(searchText);

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
 
+    @Override
     public UserDto getUserById(Long userId) {
         log.info("Получение пользователя по ID = {}", userId);
         User user = userRepository.getUserById(userId);
@@ -30,6 +31,7 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
     public List<UserDto> getAllUsers() {
         log.info("Получение всех пользователей");
         List<User> users = userRepository.findAllUsers();
@@ -39,6 +41,7 @@ public class UserService implements IUserService {
     }
 
     @Transactional
+    @Override
     public UserDto createUser(UserDto userDto) {
         log.info("Создание нового пользователя {}", userDto);
         try {
@@ -51,6 +54,7 @@ public class UserService implements IUserService {
     }
 
     @Transactional
+    @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
         log.info("Обновление пользователя с ID = {}", userId);
         User userForUpdate = userRepository.getUserById(userId);
@@ -70,6 +74,7 @@ public class UserService implements IUserService {
     }
 
     @Transactional
+    @Override
     public boolean deleteUser(Long userId) {
         User userForDelete = userRepository.getUserById(userId);
         if (userForDelete != null) {
