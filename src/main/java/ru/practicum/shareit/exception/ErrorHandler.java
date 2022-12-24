@@ -1,14 +1,17 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -78,5 +81,13 @@ public class ErrorHandler {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
         return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
                 + request.getServletPath(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleUnsupportedStatusException(UnsupportedStatusException e) {
+        log.warn("Unknown state: UNSUPPORTED_STATUS");
+        return Map.of("error", e.getMessage());
     }
 }

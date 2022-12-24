@@ -2,16 +2,14 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exception.CustomSecurityException;
-import ru.practicum.shareit.exception.NotAvailableException;
-import ru.practicum.shareit.exception.NotValidDateException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.IItemService;
 import ru.practicum.shareit.item.service.ItemMapper;
@@ -20,10 +18,9 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.IUserService;
 import ru.practicum.shareit.user.service.UserMapper;
 
+import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.shareit.booking.service.BookingMapper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -74,18 +71,44 @@ public class BookingServiceImpl implements IBookingService {
 
     @Override
     public Booking getBookingById(Long bookingId) {
-        return bookingRepository.findBookingById(bookingId);
+        Booking booking = bookingRepository.findBookingById(bookingId);
+        if (booking == null) {
+            throw new EntityNotFoundException("Брониронивание с ID " + bookingId + " не найдено");
+        }
+        return booking;
     }
 
     @Override
-    public List<Booking> getBookingsByUser(Long userId) throws UserNotFoundException {
+    public List<Booking> getBookingsByUser(Long userId, BookingStatus state) throws UserNotFoundException {
         userService.getUserById(userId);
-        return bookingRepository.getBookingsByBooker(userId);
+        if (state == null || state == BookingStatus.ALL) {
+            return bookingRepository.getBookingsByBooker(userId);
+        }
+        switch (state) {
+            case FUTURE:
+                return bookingRepository.getBookingsByBookerFuture(userId);
+            case WAITING:
+            case REJECTED:
+                return bookingRepository.getBookingsByBookerWithState(userId, state);
+            default:
+                throw new UnsupportedStatusException();
+        }
     }
 
     @Override
-    public List<Booking> getBookingByOwner(Long ownerId) throws UserNotFoundException{
+    public List<Booking> getBookingByOwner(Long ownerId, BookingStatus state) throws UserNotFoundException {
         userService.getUserById(ownerId);
-        return bookingRepository.getBookingByOwner(ownerId);
+        if (state == null || state == BookingStatus.ALL) {
+            return bookingRepository.getBookingByOwner(ownerId);
+        }
+        switch (state) {
+            case FUTURE:
+                return bookingRepository.getBookingByOwnerFuture(ownerId);
+            case WAITING:
+            case REJECTED:
+                return bookingRepository.getBookingByOwnerWithState(ownerId, state);
+            default:
+                throw new UnsupportedStatusException();
+        }
     }
 }
