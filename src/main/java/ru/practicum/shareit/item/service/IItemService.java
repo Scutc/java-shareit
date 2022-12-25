@@ -8,9 +8,9 @@ import ru.practicum.shareit.item.dto.ItemDtoXl;
 import java.util.List;
 
 public interface IItemService {
-    ItemDtoXl getItemById(Long itemId);
+    ItemDtoXl getItemById(Long itemId, Long ownerId);
 
-    List<ItemDto> getAllItems(Long userId);
+    List<ItemDtoXl> getAllItems(Long ownerId);
 
     ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException;
 

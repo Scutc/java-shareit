@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.service.IUserService;
 
 import static ru.practicum.shareit.item.service.ItemMapper.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,13 +34,13 @@ public class ItemServiceImpl implements IItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public ItemDtoXl getItemById(Long itemId) {
+    public ItemDtoXl getItemById(Long itemId, Long ownerId) {
         log.info("Получение товара с ID = {}", itemId);
         Item item = itemRepository.getItemById(itemId);
         if (item == null) {
             throw new ItemNotFoundException(itemId);
         }
-        List<Booking> bookings = bookingRepository.getBookingByItem_IdOrderByStartAsc(itemId);
+        List<Booking> bookings = bookingRepository.getBookingByItemAndOwner(itemId, ownerId);
         BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
         BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                     .orElse(null));
@@ -47,12 +48,18 @@ public class ItemServiceImpl implements IItemService {
     }
 
     @Override
-    public List<ItemDto> getAllItems(Long userId) {
+    public List<ItemDtoXl> getAllItems(Long ownerId) {
         log.info("Получение всех товаров");
-        Set<Item> items = itemRepository.getAllByOwnerId(userId);
-        return items.stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
+        List<Item> items = itemRepository.getAllByOwnerIdOrderByIdAsc(ownerId);
+        List<ItemDtoXl> result = new ArrayList<>();
+        for (Item item : items) {
+            List<Booking> bookings = bookingRepository.getBookingByItemAndOwner(item.getId(), ownerId);
+            BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
+            BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
+                                                                        .orElse(null));
+            result.add(toItemDtoXl(item, lastBooking, nextBooking));
+        }
+        return result;
     }
 
     @Transactional

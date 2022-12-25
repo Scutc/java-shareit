@@ -11,7 +11,7 @@ import java.util.Set;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Item getItemById(Long itemId);
 
-    Set<Item> getAllByOwnerId(Long ownerId);
+    List<Item> getAllByOwnerIdOrderByIdAsc(Long ownerId);
 
     @Query("SELECT i FROM Item i " +
             "WHERE UPPER(i.name) like UPPER(CONCAT('%', ?1, '%')) " +

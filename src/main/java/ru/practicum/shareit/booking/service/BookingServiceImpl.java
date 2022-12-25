@@ -35,7 +35,7 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public Booking createBooking(Long userId, BookingDto bookingDto) {
         UserDto userDto = userService.getUserById(userId);
-        ItemDtoXl itemDto = itemService.getItemById(bookingDto.getItemId());
+        ItemDtoXl itemDto = itemService.getItemById(bookingDto.getItemId(), userId);
         if (!itemDto.getAvailable()) {
             throw new NotAvailableException(bookingDto.getItemId());
         }
@@ -120,11 +120,5 @@ public class BookingServiceImpl implements IBookingService {
             default:
                 throw new UnsupportedStatusException();
         }
-    }
-
-    @Override
-    public List<Booking> getBookingByItem_Id(Long itemId) {
-        return bookingRepository.getBookingByItem_IdOrderByStartAsc(itemId);
-
     }
 }
