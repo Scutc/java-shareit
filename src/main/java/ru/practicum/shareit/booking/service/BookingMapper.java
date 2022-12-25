@@ -16,11 +16,11 @@ public class BookingMapper {
     }
 
     public static BookingDto toBookingDto(Booking booking) {
-        return new BookingDto(booking.getId(),
+        return booking != null ? new BookingDto(booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
                 booking.getBooker().getId(),
-                booking.getItem().getId());
+                booking.getItem().getId()) : null;
     }
 }

@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class BookingServiceImpl implements IBookingService {
-    private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final IItemService itemService;
     private final IUserService userService;
@@ -120,5 +119,11 @@ public class BookingServiceImpl implements IBookingService {
             default:
                 throw new UnsupportedStatusException();
         }
+    }
+
+    @Override
+    public List<Booking> getBookingByItem_Id(Long itemId) {
+        return bookingRepository.getBookingByItem_IdOrderByStartDesc(itemId);
+
     }
 }

@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingMapper;
+import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
@@ -11,6 +16,7 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.service.IUserService;
+
 import static ru.practicum.shareit.item.service.ItemMapper.*;
 
 import java.util.List;
@@ -23,6 +29,7 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements IItemService {
     private final ItemRepository itemRepository;
     private final IUserService userService;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto getItemById(Long itemId) {
@@ -31,6 +38,10 @@ public class ItemServiceImpl implements IItemService {
         if (item == null) {
             throw new ItemNotFoundException(itemId);
         }
+        List<Booking> bookings = bookingRepository.getBookingByItem_IdOrderByStartDesc(itemId);
+        BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
+        BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
+                                                                    .orElse(null));
         return toItemDto(item);
     }
 
