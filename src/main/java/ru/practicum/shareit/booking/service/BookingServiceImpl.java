@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoXl;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.IItemService;
 import ru.practicum.shareit.item.service.ItemMapper;
@@ -34,7 +35,7 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public Booking createBooking(Long userId, BookingDto bookingDto) {
         UserDto userDto = userService.getUserById(userId);
-        ItemDto itemDto = itemService.getItemById(bookingDto.getItemId());
+        ItemDtoXl itemDto = itemService.getItemById(bookingDto.getItemId());
         if (!itemDto.getAvailable()) {
             throw new NotAvailableException(bookingDto.getItemId());
         }
@@ -123,7 +124,7 @@ public class BookingServiceImpl implements IBookingService {
 
     @Override
     public List<Booking> getBookingByItem_Id(Long itemId) {
-        return bookingRepository.getBookingByItem_IdOrderByStartDesc(itemId);
+        return bookingRepository.getBookingByItem_IdOrderByStartAsc(itemId);
 
     }
 }

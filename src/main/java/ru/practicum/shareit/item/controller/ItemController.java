@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoXl;
 import ru.practicum.shareit.item.service.IItemService;
 
 import javax.validation.Valid;
@@ -20,7 +21,7 @@ public class ItemController {
     private final IItemService itemService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemDtoXl getItemById(@PathVariable Long itemId) {
         log.info("Поступил запрос на получение товара с ID {}", itemId);
         return itemService.getItemById(itemId);
     }

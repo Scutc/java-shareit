@@ -14,6 +14,7 @@ import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoXl;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.service.IUserService;
 
@@ -32,17 +33,17 @@ public class ItemServiceImpl implements IItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public ItemDto getItemById(Long itemId) {
+    public ItemDtoXl getItemById(Long itemId) {
         log.info("Получение товара с ID = {}", itemId);
         Item item = itemRepository.getItemById(itemId);
         if (item == null) {
             throw new ItemNotFoundException(itemId);
         }
-        List<Booking> bookings = bookingRepository.getBookingByItem_IdOrderByStartDesc(itemId);
+        List<Booking> bookings = bookingRepository.getBookingByItem_IdOrderByStartAsc(itemId);
         BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
         BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                     .orElse(null));
-        return toItemDto(item);
+        return toItemDtoXl(item, lastBooking, nextBooking);
     }
 
     @Override
