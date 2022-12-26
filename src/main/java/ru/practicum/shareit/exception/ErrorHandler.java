@@ -91,7 +91,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> NotAllowedToChangeException(NotAllowedToChangeException e, HttpServletRequest request) {
+    public ResponseEntity<String> handleNotAllowedToChangeException(NotAllowedToChangeException e, HttpServletRequest request) {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
         return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
                 + request.getServletPath(), HttpStatus.BAD_REQUEST);
