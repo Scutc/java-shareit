@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.service.IUserService;
 import ru.practicum.shareit.user.service.UserMapper;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
