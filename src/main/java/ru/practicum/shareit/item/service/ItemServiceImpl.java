@@ -11,14 +11,18 @@ import ru.practicum.shareit.booking.service.BookingMapper;
 import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.NotAllowedToChangeException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoXl;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.IUserService;
+import ru.practicum.shareit.user.service.UserMapper;
 
 import static ru.practicum.shareit.item.service.ItemMapper.*;
 
@@ -106,5 +110,27 @@ public class ItemServiceImpl implements IItemService {
         return items.stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
+        log.info("Создание нового комментария для вещи {} от пользователя {}", userId, itemId);
+        if (checkIfBookedItem(itemId, userId)) {
+            Comment comment = CommentMapper.toComment(commentDto);
+            User user = UserMapper.toUser(userService.getUserById(userId));
+            Item item = itemRepository.getItemById(itemId);
+            comment.setAuthor(user);
+            comment.setItem(item);
+            comment = commentRepository.save(comment);
+            return CommentMapper.toCommentDto(comment);
+        } else {
+            throw new NotAllowedToChangeException("Пользователь не брал вещь в аренду!");
+        }
+    }
+
+    private boolean checkIfBookedItem(Long itemId, Long userId) {
+        List<Booking> bookings = bookingRepository.getBookingsByItemAndBooker(userId, itemId);
+        return bookings.size() != 0;
     }
 }

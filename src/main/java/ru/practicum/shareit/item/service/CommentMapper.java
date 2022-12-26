@@ -13,4 +13,11 @@ public class CommentMapper {
                 null,
                 LocalDateTime.now());
     }
+
+    public static CommentDto toCommentDto(Comment comment) {
+        return new CommentDto(comment.getId(),
+                comment.getText(),
+                comment.getAuthor().getName(),
+                comment.getCreated());
+    }
 }

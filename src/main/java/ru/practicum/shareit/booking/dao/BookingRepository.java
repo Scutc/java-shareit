@@ -18,6 +18,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 ORDER BY b.id DESC")
     List<Booking> getBookingsByBooker(Long userId);
 
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.item.id = ?2 " +
+            "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED ORDER BY b.id DESC")
+    List<Booking> getBookingsByItemAndBooker(Long userId, Long itemId);
+
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.status = ?2 ORDER BY b.id DESC")
     List<Booking> getBookingsByBookerWithState(Long userId, BookingStatus state);
 

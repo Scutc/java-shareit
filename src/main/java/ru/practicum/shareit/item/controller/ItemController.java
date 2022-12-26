@@ -40,7 +40,8 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+                              @RequestBody ItemDto itemDto) {
         log.info("Получен запрос на обновление товара с ID {}", itemId);
         return itemService.updateItem(userId, itemId, itemDto);
     }
@@ -55,7 +56,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
-        return null;
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+                                 @Valid @RequestBody CommentDto commentDto) {
+        log.info("Получен запрос на добавление комментария для вещи {} от пользователя {}", itemId, userId);
+        return itemService.addComment(commentDto, userId, itemId);
     }
 }
