@@ -40,7 +40,7 @@ public class BookingServiceImpl implements IBookingService {
         if (!checkBookingDates(bookingDto)) {
             throw new NotValidDateException();
         }
-        if (!itemDto.getUserId().equals(userId)) {
+        if (itemDto.getUserId().equals(userId)) {
             throw new EntityNotFoundException("Нельзя забронировать собственную вещь!");
         }
         Booking booking = BookingMapper.toBooking(bookingDto);
