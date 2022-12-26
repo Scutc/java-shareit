@@ -41,7 +41,7 @@ public class BookingServiceImpl implements IBookingService {
         if (!checkBookingDates(bookingDto)) {
             throw new NotValidDateException();
         }
-        if (itemDto.getUserId() == userId) {
+        if (!itemDto.getUserId().equals(userId)) {
             throw new EntityNotFoundException("Нельзя забронировать собственную вещь!");
         }
         Booking booking = BookingMapper.toBooking(bookingDto);
@@ -91,7 +91,6 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingsByUser(Long userId, String state) throws UserNotFoundException {
         userService.getUserById(userId);
-        List<Booking> bookings = new ArrayList<>();
         if (state == null || state.equals("ALL")) {
             return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBooker(userId));
         }
