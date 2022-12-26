@@ -63,7 +63,7 @@ public class BookingServiceImpl implements IBookingService {
             throw new EntityNotFoundException("У пользователя " + userId +
                     " Отсутствуют права на изменение статуса бронирования " + bookingId);
         }
-        if (booking.getStatus().equals(BookingStatus.APPROVED) && newStatus)  {
+        if (booking.getStatus().equals(BookingStatus.APPROVED) && newStatus) {
             throw new NotAllowedToChangeException("Бронирование нельзя подтвердить повторно!");
         }
         if (newStatus) {
@@ -89,36 +89,44 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<Booking> getBookingsByUser(Long userId, BookingStatus state) throws UserNotFoundException {
+    public List<Booking> getBookingsByUser(Long userId, String state) throws UserNotFoundException {
         userService.getUserById(userId);
-        if (state == null || state == BookingStatus.ALL) {
+        if (state == null || state.equals("ALL")) {
             return bookingRepository.getBookingsByBooker(userId);
         }
         switch (state) {
-            case FUTURE:
+            case "FUTURE":
                 return bookingRepository.getBookingsByBookerFuture(userId);
-            case WAITING:
-            case REJECTED:
-                return bookingRepository.getBookingsByBookerWithState(userId, state);
+            case "CURRENT":
+                return bookingRepository.getBookingsByBookerCurrent(userId);
+            case "PAST":
+                return bookingRepository.getBookingsByBookerPast(userId);
+            case "WAITING":
+            case "REJECTED":
+                return bookingRepository.getBookingsByBookerWithState(userId, BookingStatus.valueOf(state));
             default:
-                throw new UnsupportedStatusException();
+                throw new UnsupportedStatusException(state);
         }
     }
 
     @Override
-    public List<Booking> getBookingByOwner(Long ownerId, BookingStatus state) throws UserNotFoundException {
+    public List<Booking> getBookingByOwner(Long ownerId, String state) throws UserNotFoundException {
         userService.getUserById(ownerId);
-        if (state == null || state == BookingStatus.ALL) {
+        if (state == null || state.equals("ALL")) {
             return bookingRepository.getBookingByOwner(ownerId);
         }
         switch (state) {
-            case FUTURE:
+            case "FUTURE":
                 return bookingRepository.getBookingByOwnerFuture(ownerId);
-            case WAITING:
-            case REJECTED:
-                return bookingRepository.getBookingByOwnerWithState(ownerId, state);
+            case "CURRENT":
+                return bookingRepository.getBookingsByOwnerCurrent(ownerId);
+            case "PAST":
+                return bookingRepository.getBookingsByOwnerPast(ownerId);
+            case "WAITING":
+            case "REJECTED":
+                return bookingRepository.getBookingByOwnerWithState(ownerId, BookingStatus.valueOf(state));
             default:
-                throw new UnsupportedStatusException();
+                throw new UnsupportedStatusException(state);
         }
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingMapper;
 import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.CustomSecurityException;
@@ -26,6 +27,7 @@ import ru.practicum.shareit.user.service.UserMapper;
 
 import static ru.practicum.shareit.item.service.ItemMapper.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +53,11 @@ public class ItemServiceImpl implements IItemService {
         BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
         BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                     .orElse(null));
-        List<Comment> comments = commentRepository.findCommentsById(itemId);
+        List<CommentDto> comments = commentRepository.findCommentsById(itemId)
+                                                     .stream()
+                                                     .map(CommentMapper::toCommentDto)
+                                                     .collect(Collectors.toList());
+
         return toItemDtoXl(item, lastBooking, nextBooking, comments);
     }
 
@@ -65,7 +71,10 @@ public class ItemServiceImpl implements IItemService {
             BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
             BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                         .orElse(null));
-            List<Comment> comments = commentRepository.findCommentsById(item.getId());
+            List<CommentDto> comments = commentRepository.findCommentsById(item.getId())
+                                                         .stream()
+                                                         .map(CommentMapper::toCommentDto)
+                                                         .collect(Collectors.toList());
             result.add(toItemDtoXl(item, lastBooking, nextBooking, comments));
         }
         return result;
@@ -116,7 +125,8 @@ public class ItemServiceImpl implements IItemService {
     @Override
     public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
         log.info("Создание нового комментария для вещи {} от пользователя {}", userId, itemId);
-        if (checkIfBookedItem(itemId, userId)) {
+        try {
+            checkIfBookedItem(itemId, userId);
             Comment comment = CommentMapper.toComment(commentDto);
             User user = UserMapper.toUser(userService.getUserById(userId));
             Item item = itemRepository.getItemById(itemId);
@@ -124,13 +134,19 @@ public class ItemServiceImpl implements IItemService {
             comment.setItem(item);
             comment = commentRepository.save(comment);
             return CommentMapper.toCommentDto(comment);
-        } else {
-            throw new NotAllowedToChangeException("Пользователь не брал вещь в аренду!");
+        } catch (NotAllowedToChangeException e) {
+            throw new NotAllowedToChangeException(e.getMessage());
         }
     }
 
-    private boolean checkIfBookedItem(Long itemId, Long userId) {
+    private void checkIfBookedItem(Long itemId, Long userId) throws NotAllowedToChangeException {
         List<Booking> bookings = bookingRepository.getBookingsByItemAndBooker(userId, itemId);
-        return bookings.size() != 0;
+        if (bookings.size() != 0) {
+            if (bookings.stream().noneMatch(t ->t.getEnd().isBefore(LocalDateTime.now()))) {
+                throw new NotAllowedToChangeException("Дата бронирования еще не наступила");
+            }
+        } else {
+            throw new NotAllowedToChangeException("Пользователь не брал вещь в аренду!");
+        }
     }
 }

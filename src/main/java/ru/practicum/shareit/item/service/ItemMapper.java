@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoXl;
 import ru.practicum.shareit.item.model.Comment;
@@ -30,7 +31,7 @@ public class ItemMapper {
     }
 
     public static ItemDtoXl toItemDtoXl(Item item, BookingDto lastBooking,
-                                        BookingDto nextBooking, List<Comment> comments) {
+                                        BookingDto nextBooking, List<CommentDto> comments) {
         return new ItemDtoXl(item.getId(),
                 item.getName(),
                 item.getDescription(),

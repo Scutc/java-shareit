@@ -28,10 +28,27 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end > current_timestamp ORDER BY b.id DESC")
     List<Booking> getBookingsByBookerFuture(Long userId);
 
+    @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end > current_timestamp " +
+            "AND b.start < current_timestamp ORDER BY b.id DESC")
+    List<Booking> getBookingsByBookerCurrent(Long userId);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end > current_timestamp " +
+            "AND b.start < current_timestamp ORDER BY b.id DESC")
+    List<Booking> getBookingsByOwnerCurrent(Long ownerId);
+
+    @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end < current_timestamp " +
+            "ORDER BY b.id DESC")
+    List<Booking> getBookingsByBookerPast(Long userId);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end < current_timestamp " +
+            "ORDER BY b.id DESC")
+    List<Booking> getBookingsByOwnerPast(Long ownerId);
+
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 ORDER BY b.id DESC")
     List<Booking> getBookingByOwner(Long ownerId);
 
-    @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.status = ?2 ORDER BY b.id DESC")
+    @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND " +
+            "b.status = ?2 ORDER BY b.id DESC")
     List<Booking> getBookingByOwnerWithState(Long ownerId, BookingStatus status);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end > current_timestamp ORDER BY b.id DESC")
