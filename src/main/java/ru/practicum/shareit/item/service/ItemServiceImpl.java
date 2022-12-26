@@ -139,7 +139,7 @@ public class ItemServiceImpl implements IItemService {
     private void checkIfBookedItem(Long itemId, Long userId) throws NotAllowedToChangeException {
         List<Booking> bookings = bookingRepository.getBookingsByItemAndBooker(userId, itemId);
         if (bookings.size() != 0) {
-            if (bookings.stream().noneMatch(t ->t.getEnd().isBefore(LocalDateTime.now()))) {
+            if (bookings.stream().noneMatch(t -> t.getEnd().isBefore(LocalDateTime.now()))) {
                 throw new NotAllowedToChangeException("Дата бронирования еще не наступила");
             }
         } else {

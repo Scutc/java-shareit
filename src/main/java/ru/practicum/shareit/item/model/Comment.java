@@ -7,7 +7,6 @@ import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,7 +21,7 @@ public class Comment {
     @Column(name = "comment_id", nullable = false)
     private Long id;
 
-    @Column(name ="text")
+    @Column(name = "text")
     private String text;
 
     @ManyToOne(fetch = FetchType.EAGER)

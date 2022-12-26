@@ -10,7 +10,9 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
+
 import static ru.practicum.shareit.user.service.UserMapper.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

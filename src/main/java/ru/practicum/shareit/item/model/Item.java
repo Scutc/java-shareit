@@ -9,7 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "items")
-@Getter @Setter
+@Getter
+@Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Item {
@@ -18,7 +19,7 @@ public class Item {
     @Column(name = "item_id", nullable = false)
     private Long id;
 
-    @Column(name ="name")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "description")
