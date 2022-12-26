@@ -12,9 +12,11 @@ import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoXl;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.service.IUserService;
 
@@ -32,6 +34,7 @@ public class ItemServiceImpl implements IItemService {
     private final ItemRepository itemRepository;
     private final IUserService userService;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDtoXl getItemById(Long itemId, Long ownerId) {
@@ -44,7 +47,8 @@ public class ItemServiceImpl implements IItemService {
         BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
         BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                     .orElse(null));
-        return toItemDtoXl(item, lastBooking, nextBooking);
+        List<Comment> comments = commentRepository.findCommentsById(itemId);
+        return toItemDtoXl(item, lastBooking, nextBooking, comments);
     }
 
     @Override
@@ -57,7 +61,8 @@ public class ItemServiceImpl implements IItemService {
             BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
             BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                         .orElse(null));
-            result.add(toItemDtoXl(item, lastBooking, nextBooking));
+            List<Comment> comments = commentRepository.findCommentsById(item.getId());
+            result.add(toItemDtoXl(item, lastBooking, nextBooking, comments));
         }
         return result;
     }
