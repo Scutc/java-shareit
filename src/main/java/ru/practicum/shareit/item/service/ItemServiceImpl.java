@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingMapper;
-import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.NotAllowedToChangeException;
@@ -18,7 +16,7 @@ import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoXl;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -30,7 +28,6 @@ import static ru.practicum.shareit.item.service.ItemMapper.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +40,7 @@ public class ItemServiceImpl implements IItemService {
     private final CommentRepository commentRepository;
 
     @Override
-    public ItemDtoXl getItemById(Long itemId, Long ownerId) {
+    public ItemDtoResponse getItemById(Long itemId, Long ownerId) {
         log.info("Получение товара с ID = {}", itemId);
         Item item = itemRepository.getItemById(itemId);
         if (item == null) {
@@ -62,10 +59,10 @@ public class ItemServiceImpl implements IItemService {
     }
 
     @Override
-    public List<ItemDtoXl> getAllItems(Long ownerId) {
+    public List<ItemDtoResponse> getAllItems(Long ownerId) {
         log.info("Получение всех товаров");
         List<Item> items = itemRepository.getAllByOwnerIdOrderByIdAsc(ownerId);
-        List<ItemDtoXl> result = new ArrayList<>();
+        List<ItemDtoResponse> result = new ArrayList<>();
         for (Item item : items) {
             List<Booking> bookings = bookingRepository.getBookingByItemAndOwner(item.getId(), ownerId);
             BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));

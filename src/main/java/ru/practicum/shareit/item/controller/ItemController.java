@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoXl;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.service.IItemService;
 
 import javax.validation.Valid;
@@ -22,13 +22,13 @@ public class ItemController {
     private final IItemService itemService;
 
     @GetMapping("/{itemId}")
-    public ItemDtoXl getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public ItemDtoResponse getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         log.info("Поступил запрос на получение товара с ID {} от пользователя {}", itemId, ownerId);
         return itemService.getItemById(itemId, ownerId);
     }
 
     @GetMapping
-    public List<ItemDtoXl> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDtoResponse> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Поступил запрос на получение всех товаров");
         return itemService.getAllItems(userId);
     }

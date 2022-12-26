@@ -4,14 +4,14 @@ import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoXl;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 
 import java.util.List;
 
 public interface IItemService {
-    ItemDtoXl getItemById(Long itemId, Long ownerId);
+    ItemDtoResponse getItemById(Long itemId, Long ownerId);
 
-    List<ItemDtoXl> getAllItems(Long ownerId);
+    List<ItemDtoResponse> getAllItems(Long ownerId);
 
     ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException;
 

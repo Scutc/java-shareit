@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 
@@ -22,5 +23,14 @@ public class BookingMapper {
                 booking.getStatus(),
                 booking.getBooker().getId(),
                 booking.getItem().getId()) : null;
+    }
+
+    public static BookingDtoResponse toBookingDtoResponse(Booking booking) {
+        return booking != null ? new BookingDtoResponse(booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                booking.getStatus(),
+                booking.getBooker(),
+                booking.getItem()) : null;
     }
 }
