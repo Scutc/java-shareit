@@ -29,8 +29,8 @@ public class ItemMapper {
                 itemDto.getUserId());
     }
 
-    public static ItemDtoResponse toItemDtoXl(Item item, BookingDto lastBooking,
-                                              BookingDto nextBooking, List<CommentDto> comments) {
+    public static ItemDtoResponse toItemDtoResponse(Item item, BookingDto lastBooking,
+                                                    BookingDto nextBooking, List<CommentDto> comments) {
         return new ItemDtoResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),

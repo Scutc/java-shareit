@@ -55,7 +55,7 @@ public class ItemServiceImpl implements IItemService {
                                                      .map(CommentMapper::toCommentDto)
                                                      .collect(Collectors.toList());
 
-        return toItemDtoXl(item, lastBooking, nextBooking, comments);
+        return toItemDtoResponse(item, lastBooking, nextBooking, comments);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ItemServiceImpl implements IItemService {
                                                          .stream()
                                                          .map(CommentMapper::toCommentDto)
                                                          .collect(Collectors.toList());
-            result.add(toItemDtoXl(item, lastBooking, nextBooking, comments));
+            result.add(toItemDtoResponse(item, lastBooking, nextBooking, comments));
         }
         return result;
     }

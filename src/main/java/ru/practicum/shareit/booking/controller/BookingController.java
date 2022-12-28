@@ -44,7 +44,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getBookingByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId,
-                                                     @RequestParam(required = false) String state) {
+                                                      @RequestParam(required = false) String state) {
         log.info("Поступил запрос на получение списка бронирований для пользователя " + ownerId);
         if (state == null) {
             state = "ALL";
