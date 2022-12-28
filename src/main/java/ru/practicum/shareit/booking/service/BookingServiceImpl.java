@@ -90,10 +90,9 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingsByUser(Long userId, String state) throws UserNotFoundException {
         userService.getUserById(userId);
-        if (state == null || state.equals("ALL")) {
-            return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBooker(userId));
-        }
         switch (state) {
+            case "ALL":
+                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBooker(userId));
             case "FUTURE":
                 return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBookerFuture(userId));
             case "CURRENT":
@@ -118,10 +117,9 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingByOwner(Long ownerId, String state) throws UserNotFoundException {
         userService.getUserById(ownerId);
-        if (state == null || state.equals("ALL")) {
-            return makeListOfBookingDtoResponse(bookingRepository.getBookingByOwner(ownerId));
-        }
         switch (state) {
+            case "ALL":
+                return makeListOfBookingDtoResponse(bookingRepository.getBookingByOwner(ownerId));
             case "FUTURE":
                 return makeListOfBookingDtoResponse(bookingRepository.getBookingByOwnerFuture(ownerId));
             case "CURRENT":
