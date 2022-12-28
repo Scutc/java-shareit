@@ -11,7 +11,7 @@ import java.util.List;
 public interface IItemService {
     ItemDtoResponse getItemById(Long itemId, Long ownerId);
 
-    List<ItemDtoResponse> getAllItems(Long ownerId);
+    List<ItemDtoResponse> findAllItems(Long ownerId);
 
     ItemDto createItem(Long userId, ItemDto itemDto) throws UserNotFoundException;
 

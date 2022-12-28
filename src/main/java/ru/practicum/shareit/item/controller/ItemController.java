@@ -28,9 +28,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoResponse> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDtoResponse> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Поступил запрос на получение всех товаров");
-        return itemService.getAllItems(userId);
+        return itemService.findAllItems(userId);
     }
 
     @PostMapping

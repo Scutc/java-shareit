@@ -92,17 +92,17 @@ public class BookingServiceImpl implements IBookingService {
         userService.getUserById(userId);
         switch (state) {
             case "ALL":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBooker(userId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBooker(userId));
             case "FUTURE":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBookerFuture(userId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBookerFuture(userId));
             case "CURRENT":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBookerCurrent(userId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBookerCurrent(userId));
             case "PAST":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByBookerPast(userId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBookerPast(userId));
             case "WAITING":
             case "REJECTED":
                 return makeListOfBookingDtoResponse(bookingRepository
-                        .getBookingsByBookerWithState(userId, BookingStatus.valueOf(state)));
+                        .findBookingsByBookerWithState(userId, BookingStatus.valueOf(state)));
             default:
                 throw new UnsupportedStatusException(state);
         }
@@ -119,17 +119,17 @@ public class BookingServiceImpl implements IBookingService {
         userService.getUserById(ownerId);
         switch (state) {
             case "ALL":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingByOwner(ownerId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingByOwner(ownerId));
             case "FUTURE":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingByOwnerFuture(ownerId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingByOwnerFuture(ownerId));
             case "CURRENT":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByOwnerCurrent(ownerId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByOwnerCurrent(ownerId));
             case "PAST":
-                return makeListOfBookingDtoResponse(bookingRepository.getBookingsByOwnerPast(ownerId));
+                return makeListOfBookingDtoResponse(bookingRepository.findBookingsByOwnerPast(ownerId));
             case "WAITING":
             case "REJECTED":
                 return makeListOfBookingDtoResponse(bookingRepository
-                        .getBookingByOwnerWithState(ownerId, BookingStatus.valueOf(state)));
+                        .findBookingByOwnerWithState(ownerId, BookingStatus.valueOf(state)));
             default:
                 throw new UnsupportedStatusException(state);
         }

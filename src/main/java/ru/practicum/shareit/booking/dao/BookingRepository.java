@@ -16,45 +16,45 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Booking findBookingByIdOwner(Long bookingId, Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 ORDER BY b.id DESC")
-    List<Booking> getBookingsByBooker(Long userId);
+    List<Booking> findBookingsByBooker(Long userId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.item.id = ?2 " +
             "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED ORDER BY b.id DESC")
-    List<Booking> getBookingsByItemAndBooker(Long userId, Long itemId);
+    List<Booking> findBookingsByItemAndBooker(Long userId, Long itemId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.status = ?2 ORDER BY b.id DESC")
-    List<Booking> getBookingsByBookerWithState(Long userId, BookingStatus state);
+    List<Booking> findBookingsByBookerWithState(Long userId, BookingStatus state);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end > current_timestamp ORDER BY b.id DESC")
-    List<Booking> getBookingsByBookerFuture(Long userId);
+    List<Booking> findBookingsByBookerFuture(Long userId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end > current_timestamp " +
             "AND b.start < current_timestamp ORDER BY b.id DESC")
-    List<Booking> getBookingsByBookerCurrent(Long userId);
+    List<Booking> findBookingsByBookerCurrent(Long userId);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end > current_timestamp " +
             "AND b.start < current_timestamp ORDER BY b.id DESC")
-    List<Booking> getBookingsByOwnerCurrent(Long ownerId);
+    List<Booking> findBookingsByOwnerCurrent(Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id =?1 AND b.end < current_timestamp " +
             "ORDER BY b.id DESC")
-    List<Booking> getBookingsByBookerPast(Long userId);
+    List<Booking> findBookingsByBookerPast(Long userId);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end < current_timestamp " +
             "ORDER BY b.id DESC")
-    List<Booking> getBookingsByOwnerPast(Long ownerId);
+    List<Booking> findBookingsByOwnerPast(Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 ORDER BY b.id DESC")
-    List<Booking> getBookingByOwner(Long ownerId);
+    List<Booking> findBookingByOwner(Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND " +
             "b.status = ?2 ORDER BY b.id DESC")
-    List<Booking> getBookingByOwnerWithState(Long ownerId, BookingStatus status);
+    List<Booking> findBookingByOwnerWithState(Long ownerId, BookingStatus status);
 
     @Query("SELECT b FROM Booking b WHERE b.item.ownerId =?1 AND b.end > current_timestamp ORDER BY b.id DESC")
-    List<Booking> getBookingByOwnerFuture(Long ownerId);
+    List<Booking> findBookingByOwnerFuture(Long ownerId);
 
     @Query("SELECT b FROM Booking b WHERE b.item.id = ?1 AND b.item.ownerId = ?2 " +
             "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED  ORDER BY b.start ASC")
-    List<Booking> getBookingByItemAndOwner(Long itemId, Long ownerId);
+    List<Booking> findBookingByItemAndOwner(Long itemId, Long ownerId);
 }

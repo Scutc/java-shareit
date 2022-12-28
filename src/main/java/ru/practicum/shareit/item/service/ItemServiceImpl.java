@@ -42,11 +42,11 @@ public class ItemServiceImpl implements IItemService {
     @Override
     public ItemDtoResponse getItemById(Long itemId, Long ownerId) {
         log.info("Получение товара с ID = {}", itemId);
-        Item item = itemRepository.getItemById(itemId);
+        Item item = itemRepository.findItemById(itemId);
         if (item == null) {
             throw new ItemNotFoundException(itemId);
         }
-        List<Booking> bookings = bookingRepository.getBookingByItemAndOwner(itemId, ownerId);
+        List<Booking> bookings = bookingRepository.findBookingByItemAndOwner(itemId, ownerId);
         BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
         BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                     .orElse(null));
@@ -59,12 +59,12 @@ public class ItemServiceImpl implements IItemService {
     }
 
     @Override
-    public List<ItemDtoResponse> getAllItems(Long ownerId) {
+    public List<ItemDtoResponse> findAllItems(Long ownerId) {
         log.info("Получение всех товаров");
-        List<Item> items = itemRepository.getAllByOwnerIdOrderByIdAsc(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(ownerId);
         List<ItemDtoResponse> result = new ArrayList<>();
         for (Item item : items) {
-            List<Booking> bookings = bookingRepository.getBookingByItemAndOwner(item.getId(), ownerId);
+            List<Booking> bookings = bookingRepository.findBookingByItemAndOwner(item.getId(), ownerId);
             BookingDto lastBooking = BookingMapper.toBookingDto(bookings.stream().findFirst().orElse(null));
             BookingDto nextBooking = BookingMapper.toBookingDto(bookings.stream().reduce((first, last) -> last)
                                                                         .orElse(null));
@@ -92,7 +92,7 @@ public class ItemServiceImpl implements IItemService {
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws CustomSecurityException {
         log.info("Обновление товара");
         userService.getUserById(userId);
-        Item itemForUpdate = itemRepository.getItemById(itemId);
+        Item itemForUpdate = itemRepository.findItemById(itemId);
         if (!itemForUpdate.getOwnerId().equals(userId)) {
             throw new CustomSecurityException("У пользователя отсутствуют права на изменение товара!");
         }
@@ -126,7 +126,7 @@ public class ItemServiceImpl implements IItemService {
             checkIfBookedItem(itemId, userId);
             Comment comment = CommentMapper.toComment(commentDto);
             User user = UserMapper.toUser(userService.getUserById(userId));
-            Item item = itemRepository.getItemById(itemId);
+            Item item = itemRepository.findItemById(itemId);
             comment.setAuthor(user);
             comment.setItem(item);
             comment = commentRepository.save(comment);
@@ -137,7 +137,7 @@ public class ItemServiceImpl implements IItemService {
     }
 
     private void checkIfBookedItem(Long itemId, Long userId) throws NotAllowedToChangeException {
-        List<Booking> bookings = bookingRepository.getBookingsByItemAndBooker(userId, itemId);
+        List<Booking> bookings = bookingRepository.findBookingsByItemAndBooker(userId, itemId);
         if (bookings.size() != 0) {
             if (bookings.stream().noneMatch(t -> t.getEnd().isBefore(LocalDateTime.now()))) {
                 throw new NotAllowedToChangeException("Дата бронирования еще не наступила");

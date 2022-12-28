@@ -25,9 +25,9 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> findAllUsers() {
         log.info("Поступил запрос на получение всех пользователей");
-        return userService.getAllUsers();
+        return userService.findAllUsers();
     }
 
     @PostMapping

@@ -34,7 +34,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> findAllUsers() {
         log.info("Получение всех пользователей");
         List<User> users = userRepository.findAllUsers();
         return users.stream()
