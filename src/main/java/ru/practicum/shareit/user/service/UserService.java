@@ -78,12 +78,12 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public boolean deleteUser(Long userId) {
-        User userForDelete = userRepository.getUserById(userId);
-        if (userForDelete != null) {
+        try {
+            User userForDelete = userRepository.getUserById(userId);
             userRepository.delete(userForDelete);
             log.info("Удаление пользователя ID = {} успешно", userId);
             return true;
-        } else {
+        } catch (UserNotFoundException e) {
             log.info("Удаление пользователя ID = {} не удалось, пользователь не найден", userId);
             return false;
         }
