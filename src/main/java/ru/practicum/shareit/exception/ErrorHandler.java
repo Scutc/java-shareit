@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         log.warn("Ошибка валидации полей объекта: {} {}. Путь запроса {}", e.getFieldError().getField(),
@@ -27,7 +27,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public ResponseEntity<String> handleDuplicateDataException(DuplicateDataException e, HttpServletRequest request) {
         log.warn("Дублирующиеся данные {} по пути запроса {}", e.getMessage(), request.getServletPath());
@@ -36,7 +35,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
@@ -45,7 +43,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
@@ -54,7 +51,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ResponseEntity<String> handleItemNotFoundException(ItemNotFoundException e, HttpServletRequest request) {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
@@ -63,11 +59,41 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
     public ResponseEntity<String> handleSecurityException(CustomSecurityException e, HttpServletRequest request) {
         log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
         return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
                 + request.getServletPath(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public ResponseEntity<String> handleNotAvailableException(NotAvailableException e, HttpServletRequest request) {
+        log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
+        return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
+                + request.getServletPath(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public ResponseEntity<String> handleNotValidDataException(NotValidDateException e, HttpServletRequest request) {
+        log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
+        return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
+                + request.getServletPath(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleUnsupportedStatusException(UnsupportedStatusException e) {
+        log.warn("Unknown state: UNSUPPORTED_STATUS");
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleNotAllowedToChangeException(NotAllowedToChangeException e, HttpServletRequest request) {
+        log.warn("{}. Путь запроса {}", e.getMessage(), request.getServletPath());
+        return new ResponseEntity<>(e.getMessage() + " Путь запроса: "
+                + request.getServletPath(), HttpStatus.BAD_REQUEST);
     }
 }

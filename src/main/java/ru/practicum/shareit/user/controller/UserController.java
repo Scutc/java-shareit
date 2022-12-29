@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.service.IUserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final IUserService userService;
 
     @GetMapping("/{userId}")
     public UserDto getUserById(@PathVariable Long userId) {
@@ -25,9 +25,9 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> findAllUsers() {
         log.info("Поступил запрос на получение всех пользователей");
-        return userService.getAllUsers();
+        return userService.findAllUsers();
     }
 
     @PostMapping

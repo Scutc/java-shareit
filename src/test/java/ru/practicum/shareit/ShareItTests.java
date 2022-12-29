@@ -4,85 +4,125 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.item.dao.ItemDao;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.dao.UserDao;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.service.IBookingService;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.service.IItemService;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.IUserService;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 class ShareItTests {
-    private final UserDao userDao;
-    private final ItemDao itemDao;
-    private User user;
-    private Long userId;
-    private Item item;
-    private Long itemId;
+    @Autowired
+    IUserService userService;
+
+    @Autowired
+    IBookingService bookingService;
+
+    @Autowired
+    IItemService itemService;
 
     @Test
     void contextLoads() {
     }
 
     @BeforeEach
-    public void before() {
-        user = new User(0L, "User1", "user1@gmail.com");
-        userId = userDao.createUser(user).getId();
-        item = new Item(0L, "Item Vacuum", "Description vacuum", Boolean.TRUE, 1L);
-        itemId = itemDao.createItem(item).getId();
-    }
-
-    @AfterEach
-    public void after() {
-        userDao.deleteUser(userId);
-        itemDao.getAllItems(itemId).remove(itemId);
+    void before() {
     }
 
     @Test
-    public void testCreateAndGetUser() {
-        assertThat(userDao.getUserById(userId).getName().equals("User1"));
+    void createGetUpdateDeleteUserTest() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        UserDto userDto1 = userService.getUserById(userDto.getId());
+        Long userId = userDto1.getId();
+
+        assertThat(userDto.equals(userDto1));
+        userDto1.setName("UserAfterUpdate");
+        userService.updateUser(userId, userDto1);
+        assertThat(userService.updateUser(userId, userDto1).getName().equals("UserAfterUpdate"));
+        userService.deleteUser(userId);
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
     }
 
     @Test
-    public void testUpdateUser() {
-        User user2 = new User(0L, "User1", "update@gmail.com");
-        userDao.updateUser(userId, user2);
-        assertThat(userDao.getUserById(userId).getEmail().equals("update@gmail.com"));
+    void createGetUpdateItemTest() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId = userDto.getId();
+
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        itemDto = itemService.createItem(userId, itemDto);
+        Long itemId = itemDto.getId();
+        assertThat(itemService.getItemById(itemId, userId).getName().equals("Item1"));
+
+        itemDto.setName("ItemAfterUpdate");
+        itemService.updateItem(userId, itemId, itemDto);
+        assertThat(itemService.getItemById(itemId, userId).getName().equals("ItemAfterUpdate"));
     }
 
     @Test
-    public void testGetAllUsers() {
-        assertThat(userDao.getAllUsers().size() == 1);
+    void bookingCreateGetUpdate() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId = userDto.getId();
+        userDto = new UserDto(0L, "User2", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId1 = userDto.getId();
+
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        itemDto = itemService.createItem(userId, itemDto);
+        Long itemId = itemDto.getId();
+
+        BookingDto bookingDto = new BookingDto(0L, LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2), BookingStatus.WAITING, userId1, itemId);
+        BookingDtoResponse bookingDtoResponse = bookingService.createBooking(userId1, bookingDto);
+        Long bookingId = bookingDtoResponse.getId();
+
+        assertThat(bookingService.getBookingById(bookingId, userId1) != null);
+
+        bookingService.updateBookingStatus(userId, bookingId, true);
+        assertThat(bookingService.getBookingById(bookingId, userId1).getStatus().equals(BookingStatus.APPROVED));
     }
 
     @Test
-    public void testDeleteUser() {
-        userDao.deleteUser(userId);
-        assertThat(userDao.getAllUsers().size() == 0);
-    }
+    void addCommentTest() throws InterruptedException {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId = userDto.getId();
+        userDto = new UserDto(0L, "User2", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId1 = userDto.getId();
 
-    @Test
-    public void testItemCreateAndGet() {
-        assertThat(itemDao.getItemById(userId).getName().equals("Item Vacuum"));
-    }
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        itemDto = itemService.createItem(userId, itemDto);
+        Long itemId = itemDto.getId();
 
-    @Test
-    public void testGetAllItems() {
-        assertThat(itemDao.getAllItems(userId).size() == 1);
-    }
+        BookingDto bookingDto = new BookingDto(0L, LocalDateTime.now().plusSeconds(1),
+                LocalDateTime.now().plusSeconds(2), BookingStatus.WAITING, userId1, itemId);
+        BookingDtoResponse bookingDtoResponse = bookingService.createBooking(userId1, bookingDto);
+        Long bookingId = bookingDtoResponse.getId();
+        bookingService.updateBookingStatus(userId, bookingId, true);
 
-    @Test
-    public void testUpdateItem() {
-        Item item2 = new Item(0L, "Item Update", "Description vacuum", Boolean.TRUE, 1L);
-        itemDao.updateItem(itemId, item2);
-        assertThat(itemDao.getItemById(itemId).getName().equals("Item Update"));
-    }
+        Thread.sleep(3000);
 
-    @Test
-    public void testSearchItem() {
-        assertThat(itemDao.searchItem("VacUUm").get(0).getName().equals("Item Update"));
+        CommentDto commentDto = new CommentDto(0L, "Text", userDto.getName(), LocalDateTime.now());
+        itemService.addComment(commentDto, userId1, itemDto.getId());
+
+        assertThat(itemService.getItemById(itemDto.getId(), userId1).getComments().size() == 1);
     }
 }

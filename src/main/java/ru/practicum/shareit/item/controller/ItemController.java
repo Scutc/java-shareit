@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
+import ru.practicum.shareit.item.service.IItemService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -16,18 +19,18 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemService itemService;
+    private final IItemService itemService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        log.info("Поступил запрос на получение товара с ID {}", itemId);
-        return itemService.getItemById(itemId);
+    public ItemDtoResponse getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        log.info("Поступил запрос на получение товара с ID {} от пользователя {}", itemId, ownerId);
+        return itemService.getItemById(itemId, ownerId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDtoResponse> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Поступил запрос на получение всех товаров");
-        return itemService.getAllItems(userId);
+        return itemService.findAllItems(userId);
     }
 
     @PostMapping
@@ -43,8 +46,17 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> serachItems(@RequestParam String text) {
-        log.info("Получена запрос на поиск товаров по тексту \"{}\"", text);
+    public List<ItemDto> searchItems(@RequestParam String text) {
+        log.info("Получен запрос на поиск товаров по тексту \"{}\"", text);
+        if (text.isBlank()) {
+            return Collections.EMPTY_LIST;
+        }
         return itemService.searchItem(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
+        log.info("Получен запрос на добавление комментария для вещи {} от пользователя {}", itemId, userId);
+        return itemService.addComment(commentDto, userId, itemId);
     }
 }
