@@ -88,7 +88,7 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getBookingsByUser(Long userId, String state) throws UserNotFoundException {
+    public List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Long from, Long size) throws UserNotFoundException {
         userService.getUserById(userId);
         switch (state) {
             case "ALL":

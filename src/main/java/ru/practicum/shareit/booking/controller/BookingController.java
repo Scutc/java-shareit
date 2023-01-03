@@ -54,11 +54,13 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingDtoResponse> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @RequestParam(required = false) String state) {
+                                                   @RequestParam(required = false) String state,
+                                                   @RequestParam(required = false) Long from,
+                                                   @RequestParam(required = false) Long size) {
         log.info("Поступил запрос на получение всех бронирований");
         if (state == null) {
             state = "ALL";
         }
-        return bookingService.getBookingsByUser(userId, state);
+        return bookingService.getBookingsByUser(userId, state, from, size);
     }
 }

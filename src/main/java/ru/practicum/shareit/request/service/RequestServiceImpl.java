@@ -14,6 +14,7 @@ import ru.practicum.shareit.request.dto.RequestDtoForResponse;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.service.IUserService;
+import ru.practicum.shareit.utility.PaginationConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class RequestServiceImpl implements IRequestService {
     private final RequestRepository requestRepository;
     private final IUserService userService;
     private final UserRepository userRepository;
+    private final PaginationConverter paginationConverter;
 
     @Transactional
     @Override
@@ -50,21 +52,9 @@ public class RequestServiceImpl implements IRequestService {
     @Override
     public List<RequestDtoForResponse> findAllRequests(Long userId, Integer from, Integer size) {
         userService.getUserById(userId);
-        Pageable pageable;
-        if (from == null && size == null) {
-            pageable = Pageable.unpaged();
-
-        } else if (checkPagination(from, size)) {
-            pageable = PageRequest.of(from, size);
-        } else {
-            throw new NotValidParamsException("Некорректно заданы параметры пагинации!");
-        }
+        Pageable pageable = paginationConverter.convert(from, size);
         List<Request> requests = requestRepository.findAllRequests(userId, pageable);
         return requests.stream().map(RequestMapper::toRequestDtoForResponse).collect(Collectors.toList());
-    }
-
-    private boolean checkPagination(Integer from, Integer size) {
-        return from >= 0 && size >= 0;
     }
 
     @Override

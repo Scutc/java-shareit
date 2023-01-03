@@ -10,7 +10,7 @@ public interface IBookingService {
 
     BookingDtoResponse updateBookingStatus(Long userId, Long bookingId, Boolean newStatus);
 
-    List<BookingDtoResponse> getBookingsByUser(Long userId, String state);
+    List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Long from, Long size);
 
     BookingDtoResponse getBookingById(Long bookingId, Long userId);
 
