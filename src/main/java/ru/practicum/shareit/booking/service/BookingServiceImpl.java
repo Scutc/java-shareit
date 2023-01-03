@@ -2,6 +2,10 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -92,7 +96,12 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(userId);
-        paginationConverter.convert(from, size);
+        Pageable pageable = paginationConverter.convert(from, size);
+        if (!pageable.isUnpaged() ) {
+            Pageable pageable1 = PageRequest.of(from, 1, Sort.by("start").descending());
+            List<Booking> bookings = bookingRepository.findByBookerId(userId, pageable1).toList();
+            return makeListOfBookingDtoResponse(bookings);
+        }
         switch (state) {
             case "ALL":
                 return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBooker(userId));
@@ -120,7 +129,12 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingByOwner(Long ownerId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(ownerId);
-        paginationConverter.convert(from, size);
+        Pageable pageable = paginationConverter.convert(from, size);
+        if (!pageable.isUnpaged()) {
+            Pageable pageable1 = PageRequest.of(from, 1, Sort.by("start").descending());
+            List<Booking> bookings = bookingRepository.findByOwnerId(ownerId, pageable1).toList();
+            return makeListOfBookingDtoResponse(bookings);
+        }
         switch (state) {
             case "ALL":
                 return makeListOfBookingDtoResponse(bookingRepository.findBookingByOwner(ownerId));
