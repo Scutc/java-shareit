@@ -23,6 +23,6 @@ public class PaginationConverter {
     }
 
     private boolean checkPagination(Integer from, Integer size) {
-        return from >= 0 && size >= 0;
+        return from >= 0 && size > 0;
     }
 }
