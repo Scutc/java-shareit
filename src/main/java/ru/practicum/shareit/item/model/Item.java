@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.request.model.Request;
 
 import javax.persistence.*;
 
@@ -30,4 +32,9 @@ public class Item {
 
     @Column(name = "owner_id")
     private Long ownerId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "request_id")
+    @JsonBackReference
+    private Request request;
 }
