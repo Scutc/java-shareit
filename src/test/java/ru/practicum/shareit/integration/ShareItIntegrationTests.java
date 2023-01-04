@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.integration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
-class ShareItTests {
+class ShareItIntegrationTests {
     @Autowired
     IUserService userService;
 
@@ -65,7 +65,7 @@ class ShareItTests {
         userDto = userService.createUser(userDto);
         Long userId = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
         assertThat(itemService.getItemById(itemId, userId).getName().equals("Item1"));
@@ -84,7 +84,7 @@ class ShareItTests {
         userDto = userService.createUser(userDto);
         Long userId1 = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
 
@@ -108,7 +108,7 @@ class ShareItTests {
         userDto = userService.createUser(userDto);
         Long userId1 = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
 

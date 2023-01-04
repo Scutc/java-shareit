@@ -52,7 +52,7 @@ public class RequestServiceImpl implements IRequestService {
     @Override
     public List<RequestDtoForResponse> findAllRequests(Long userId, Integer from, Integer size) {
         userService.getUserById(userId);
-        Pageable pageable = paginationConverter.convert(from, size);
+        Pageable pageable = paginationConverter.convert(from, size, "created");
         List<Request> requests = requestRepository.findAllRequests(userId, pageable);
         return requests.stream().map(RequestMapper::toRequestDtoForResponse).collect(Collectors.toList());
     }

@@ -96,10 +96,9 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(userId);
-        Pageable pageable = paginationConverter.convert(from, size);
+        Pageable pageable = paginationConverter.convert(from, size, "start");
         if (!pageable.isUnpaged() ) {
-            Pageable pageable1 = PageRequest.of(from, 1, Sort.by("start").descending());
-            List<Booking> bookings = bookingRepository.findByBookerId(userId, pageable1).toList();
+            List<Booking> bookings = bookingRepository.findByBookerId(userId, pageable).toList();
             return makeListOfBookingDtoResponse(bookings);
         }
         switch (state) {
@@ -129,10 +128,9 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public List<BookingDtoResponse> getBookingByOwner(Long ownerId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(ownerId);
-        Pageable pageable = paginationConverter.convert(from, size);
+        Pageable pageable = paginationConverter.convert(from, size, "start");
         if (!pageable.isUnpaged()) {
-            Pageable pageable1 = PageRequest.of(from, 1, Sort.by("start").descending());
-            List<Booking> bookings = bookingRepository.findByOwnerId(ownerId, pageable1).toList();
+            List<Booking> bookings = bookingRepository.findByOwnerId(ownerId, pageable).toList();
             return makeListOfBookingDtoResponse(bookings);
         }
         switch (state) {
