@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
@@ -8,6 +9,9 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
@@ -19,6 +23,8 @@ import ru.practicum.shareit.config.BookingControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
 import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.NotValidDateException;
+import ru.practicum.shareit.exception.NotValidParamsException;
+import ru.practicum.shareit.exception.UnsupportedStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -146,5 +152,21 @@ public class BookingControllerTest {
            .andExpect(jsonPath("$[0].status", is(bookingDtoResponse.getStatus().toString())))
            .andExpect(jsonPath("$[0].start", is(notNullValue())))
            .andExpect(jsonPath("$[0].end", is(notNullValue())));
+    }
+
+    @Test
+    void getAllBookingsTestException () throws Exception {
+        when(bookingService.getBookingsByUser(any(), any(), any(), any()))
+                .thenThrow(new UnsupportedStatusException("STATUSBAD"));
+        mvc.perform(get("/bookings").header("X-Sharer-User-Id", 1L))
+           .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllBookingsTestException2 () throws Exception {
+        when(bookingService.getBookingsByUser(any(), any(), any(), any()))
+                .thenThrow(NotValidParamsException.class);
+        mvc.perform(get("/bookings").header("X-Sharer-User-Id", 1L))
+           .andExpect(status().isBadRequest());
     }
 }

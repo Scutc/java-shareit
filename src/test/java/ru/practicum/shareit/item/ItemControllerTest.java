@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.config.ItemControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
+import ru.practicum.shareit.exception.CustomSecurityException;
 import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.NotAllowedToChangeException;
@@ -161,5 +163,19 @@ public class ItemControllerTest {
                    .contentType(MediaType.APPLICATION_JSON)
                    .accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addCommentTestSecurityException() throws Exception {
+        CommentDto commentDto = new CommentDto(1L, "text", "name", LocalDateTime.now());
+        when(itemService.addComment(any(), any(), any()))
+                .thenThrow(CustomSecurityException.class);
+        mvc.perform(post("/items/1/comment")
+                   .header("X-Sharer-User-Id", 1L)
+                   .content(mapper.writeValueAsString(commentDto))
+                   .characterEncoding(StandardCharsets.UTF_8)
+                   .contentType(MediaType.APPLICATION_JSON)
+                   .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isForbidden());
     }
 }
