@@ -1,23 +1,14 @@
-package ru.practicum.shareit.mvc.request;
+package ru.practicum.shareit.request;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
-import ru.practicum.shareit.item.controller.ItemController;
-import ru.practicum.shareit.mvc.item.ItemControllerTestConfig;
 import ru.practicum.shareit.request.controller.RequestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.shareit.item.controller.ItemController;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.service.IItemService;
 import org.springframework.http.MediaType;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestDtoForResponse;
@@ -72,7 +63,8 @@ public class RequestControllerTest {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(requestDtoForResponse.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(requestDtoForResponse.getId()), Long.class))
+           .andExpect(jsonPath("$.description", is(requestDtoForResponse.getDescription())));
     }
 
     @Test
@@ -83,7 +75,8 @@ public class RequestControllerTest {
         mvc.perform(get("/requests").header("X-Sharer-User-Id", 1L))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$", hasSize(1)))
-           .andExpect(jsonPath("$[0].id", is(requestDtoForResponse.getId()), Long.class));
+           .andExpect(jsonPath("$[0].id", is(requestDtoForResponse.getId()), Long.class))
+           .andExpect(jsonPath("$[0].description", is(requestDtoForResponse.getDescription())));
     }
 
     @Test
@@ -94,17 +87,17 @@ public class RequestControllerTest {
         mvc.perform(get("/requests/all").header("X-Sharer-User-Id", 1L))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$", hasSize(1)))
-           .andExpect(jsonPath("$[0].id", is(requestDtoForResponse.getId()), Long.class));
+           .andExpect(jsonPath("$[0].id", is(requestDtoForResponse.getId()), Long.class))
+           .andExpect(jsonPath("$[0].description", is(requestDtoForResponse.getDescription())));
     }
 
     @Test
     void getRequestByIdTest() throws Exception {
-        when(requestService.getRequestById(any(),any()))
+        when(requestService.getRequestById(any(), any()))
                 .thenReturn(requestDtoForResponse);
         mvc.perform(get("/requests/1").header("X-Sharer-User-Id", 1L))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(requestDtoForResponse.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(requestDtoForResponse.getId()), Long.class))
+           .andExpect(jsonPath("$.description", is(requestDtoForResponse.getDescription())));
     }
-
-
 }

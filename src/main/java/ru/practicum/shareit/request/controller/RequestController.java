@@ -46,7 +46,5 @@ public class RequestController {
         log.info("Поступил запрос на получение Запроса на бронирование с ID = {} от пользователя {}",
                 requestId, userId );
         return requestService.getRequestById(requestId, userId);
-
-
     }
 }

@@ -1,6 +1,5 @@
-package ru.practicum.shareit.mvc.user;
+package ru.practicum.shareit.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringJUnitWebConfig({ UserController.class, ru.practicum.user.UserControllerTestConfig.class,
+@SpringJUnitWebConfig({ UserController.class, UserControllerTestConfig.class,
         ru.practicum.config.WebConfig.class})
 public class UserControllerTest {
     @Mock

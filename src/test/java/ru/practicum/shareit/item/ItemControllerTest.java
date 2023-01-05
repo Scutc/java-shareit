@@ -1,4 +1,4 @@
-package ru.practicum.shareit.mvc.item;
+package ru.practicum.shareit.item;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +62,10 @@ public class ItemControllerTest {
 
         mvc.perform(get("/items/1").header("X-Sharer-User-Id", 1L))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(itemDtoResponse.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(itemDtoResponse.getId()), Long.class))
+           .andExpect(jsonPath("$.name", is(itemDtoResponse.getName())))
+           .andExpect(jsonPath("$.description", is(itemDtoResponse.getDescription())))
+           .andExpect(jsonPath("$.available", is(itemDtoResponse.getAvailable())));
     }
 
     @Test
@@ -73,7 +76,9 @@ public class ItemControllerTest {
         mvc.perform(get("/items").header("X-Sharer-User-Id", 1L))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$", hasSize(1)))
-           .andExpect(jsonPath("$[0].id", is(itemDtoResponse.getId()), Long.class));
+           .andExpect(jsonPath("$[0].id", is(itemDtoResponse.getId()), Long.class))
+           .andExpect(jsonPath("$[0].description", is(itemDtoResponse.getDescription())))
+           .andExpect(jsonPath("$[0].available", is(itemDtoResponse.getAvailable())));
     }
 
     @Test
@@ -88,7 +93,9 @@ public class ItemControllerTest {
                    .contentType(MediaType.APPLICATION_JSON)
                    .accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
+           .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
+           .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
     }
 
     @Test
@@ -103,7 +110,9 @@ public class ItemControllerTest {
                    .contentType(MediaType.APPLICATION_JSON)
                    .accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
+           .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
+           .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
     }
 
     @Test
@@ -114,7 +123,9 @@ public class ItemControllerTest {
         mvc.perform(get("/items/search").param("text", "ddd"))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$", hasSize(1)))
-           .andExpect(jsonPath("$[0].id", is(itemDtoResponse.getId()), Long.class));
+           .andExpect(jsonPath("$[0].id", is(itemDtoResponse.getId()), Long.class))
+           .andExpect(jsonPath("$[0].description", is(itemDtoResponse.getDescription())))
+           .andExpect(jsonPath("$[0].available", is(itemDtoResponse.getAvailable())));
     }
 
     @Test
@@ -130,6 +141,7 @@ public class ItemControllerTest {
                    .contentType(MediaType.APPLICATION_JSON)
                    .accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class));
+           .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
+           .andExpect(jsonPath("$.text", is(commentDto.getText())));
     }
 }
