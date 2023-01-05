@@ -16,7 +16,8 @@ public class PaginationConverter {
         if (from == null && size == null) {
             pageable = Pageable.unpaged();
         } else if (checkPagination(from, size)) {
-            pageable = PageRequest.of(from, 1, Sort.by(sortBy).descending());
+            pageable = sortBy != null ? PageRequest.of(from, 1, Sort.by(sortBy).descending())
+                    : PageRequest.of(from, 1);
         } else {
             throw new NotValidParamsException("Некорректно заданы параметры пагинации!");
         }
