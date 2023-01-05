@@ -16,12 +16,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CommentDto {
     private Long id;
-
     @NotBlank
     private String text;
-
     private String authorName;
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime created;

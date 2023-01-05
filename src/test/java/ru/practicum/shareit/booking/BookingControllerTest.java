@@ -15,6 +15,8 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.IBookingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import ru.practicum.shareit.config.BookingControllerTestConfig;
+import ru.practicum.shareit.config.WebConfig;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -27,8 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({BookingController.class, BookingControllerTestConfig.class,
-        ru.practicum.config.WebConfig.class})
+@SpringJUnitWebConfig({BookingController.class, BookingControllerTestConfig.class, WebConfig.class})
 public class BookingControllerTest {
     @Mock
     private IBookingService bookingService;
@@ -76,7 +77,7 @@ public class BookingControllerTest {
     @Test
     void updateBookingTest() throws Exception {
         bookingDtoResponse.setStatus(BookingStatus.APPROVED);
-        when(bookingService.updateBookingStatus(1L,1L,true))
+        when(bookingService.updateBookingStatus(1L, 1L, true))
                 .thenReturn(bookingDtoResponse);
 
         mvc.perform(patch("/bookings/1")
@@ -108,7 +109,7 @@ public class BookingControllerTest {
 
     @Test
     void getBookingByOwnerTest() throws Exception {
-        when(bookingService.getBookingByOwner(any(),any(), any(), any()))
+        when(bookingService.getBookingByOwner(any(), any(), any(), any()))
                 .thenReturn(List.of(bookingDtoResponse));
 
         mvc.perform(get("/bookings/owner").header("X-Sharer-User-Id", 1L))

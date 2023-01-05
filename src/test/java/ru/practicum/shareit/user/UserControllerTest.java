@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.config.UserControllerTestConfig;
+import ru.practicum.shareit.config.WebConfig;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.IUserService;
@@ -25,8 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringJUnitWebConfig({ UserController.class, UserControllerTestConfig.class,
-        ru.practicum.config.WebConfig.class})
+@SpringJUnitWebConfig({ UserController.class, UserControllerTestConfig.class, WebConfig.class})
 public class UserControllerTest {
     @Mock
     private IUserService userService;

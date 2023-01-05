@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,8 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.config.ItemControllerTestConfig;
+import ru.practicum.shareit.config.WebConfig;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -28,8 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({ItemController.class, ItemControllerTestConfig.class,
-        ru.practicum.config.WebConfig.class})
+@SpringJUnitWebConfig({ItemController.class, ItemControllerTestConfig.class, WebConfig.class})
 public class ItemControllerTest {
     @Mock
     private IItemService itemService;

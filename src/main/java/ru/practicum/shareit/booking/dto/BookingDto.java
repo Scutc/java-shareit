@@ -16,18 +16,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BookingDto {
     private Long id;
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime start;
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime end;
-
     private BookingStatus bookingStatus;
-
     private Long bookerId;
-
     private Long itemId;
 }

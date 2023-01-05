@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request;
 
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
+import ru.practicum.shareit.config.RequestControllerTestConfig;
+import ru.practicum.shareit.config.WebConfig;
 import ru.practicum.shareit.request.controller.RequestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({RequestController.class, RequestControllerTestConfig.class,
-        ru.practicum.config.WebConfig.class})
+@SpringJUnitWebConfig({RequestController.class, RequestControllerTestConfig.class, WebConfig.class})
 public class RequestControllerTest {
     @Mock
     private IRequestService requestService;

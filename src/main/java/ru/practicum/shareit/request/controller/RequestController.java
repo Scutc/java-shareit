@@ -34,8 +34,8 @@ public class RequestController {
 
     @GetMapping("/all")
     public List<RequestDtoForResponse> findRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                                 @RequestParam(required = false) Integer from,
-                                                                 @RequestParam(required = false) Integer size) {
+                                                                  @RequestParam(required = false) Integer from,
+                                                                  @RequestParam(required = false) Integer size) {
         log.info("Поступил запроc на получение списка Запросов других пользователей от пользователя {}", userId);
         return requestService.findAllRequests(userId, from, size);
     }
@@ -44,7 +44,7 @@ public class RequestController {
     public RequestDtoForResponse getRequestById(@PathVariable Long requestId,
                                                 @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Поступил запрос на получение Запроса на бронирование с ID = {} от пользователя {}",
-                requestId, userId );
+                requestId, userId);
         return requestService.getRequestById(requestId, userId);
     }
 }
