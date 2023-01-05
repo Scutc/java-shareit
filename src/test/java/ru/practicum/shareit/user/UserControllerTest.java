@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.config.UserControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.IUserService;
@@ -21,13 +24,14 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringJUnitWebConfig({ UserController.class, UserControllerTestConfig.class, WebConfig.class})
+@SpringJUnitWebConfig({ UserController.class, UserControllerTestConfig.class, WebConfig.class, ErrorHandler.class})
 public class UserControllerTest {
     @Mock
     private IUserService userService;
@@ -44,7 +48,7 @@ public class UserControllerTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
-                .standaloneSetup(controller)
+                .standaloneSetup(new ErrorHandler(), controller)
                 .build();
 
         userDto = new UserDto(1L, "User1", "user1@email.ru");
@@ -64,6 +68,16 @@ public class UserControllerTest {
            .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
            .andExpect(jsonPath("$.name", is(userDto.getName())))
            .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+
+        when(userService.createUser(any()))
+                .thenThrow(DuplicateDataException.class);
+
+        mvc.perform(post("/users")
+                .content(mapper.writeValueAsString(userDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -76,6 +90,33 @@ public class UserControllerTest {
            .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
            .andExpect(jsonPath("$.name", is(userDto.getName())))
            .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+
+    }
+
+    @Test
+    void getUserByIdTestException() throws Exception {
+        when(userService.getUserById(anyLong()))
+                .thenThrow(UserNotFoundException.class);
+
+        mvc.perform(get("/users/1")
+                   .content(mapper.writeValueAsString(userDto))
+                   .characterEncoding(StandardCharsets.UTF_8)
+                   .contentType(MediaType.APPLICATION_JSON)
+                   .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getUserWithEntityNotFoundException() throws Exception {
+        when(userService.getUserById(anyLong()))
+                .thenThrow(EntityNotFoundException.class);
+
+        mvc.perform(get("/users/1")
+                   .content(mapper.writeValueAsString(userDto))
+                   .characterEncoding(StandardCharsets.UTF_8)
+                   .contentType(MediaType.APPLICATION_JSON)
+                   .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isNotFound());
     }
 
     @Test void getAllUsersTest() throws Exception {

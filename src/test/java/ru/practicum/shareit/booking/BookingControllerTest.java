@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import ru.practicum.shareit.config.BookingControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
+import ru.practicum.shareit.exception.ErrorHandler;
+import ru.practicum.shareit.exception.NotValidDateException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -29,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({BookingController.class, BookingControllerTestConfig.class, WebConfig.class})
+@SpringJUnitWebConfig({BookingController.class, BookingControllerTestConfig.class, WebConfig.class, Exception.class})
 public class BookingControllerTest {
     @Mock
     private IBookingService bookingService;
@@ -47,7 +49,7 @@ public class BookingControllerTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
-                .standaloneSetup(controller)
+                .standaloneSetup(new ErrorHandler(), controller)
                 .build();
 
         bookingDto = new BookingDto(1L, LocalDateTime.now(), LocalDateTime.now().plusHours(2),
@@ -72,6 +74,17 @@ public class BookingControllerTest {
            .andExpect(jsonPath("$.status", is(bookingDtoResponse.getStatus().toString())))
            .andExpect(jsonPath("$.start", is(notNullValue())))
            .andExpect(jsonPath("$.end", is(notNullValue())));
+
+        when(bookingService.createBooking(any(), any()))
+                .thenThrow(NotValidDateException.class);
+
+        mvc.perform(post("/bookings")
+                   .header("X-Sharer-User-Id", 1L)
+                   .content(mapper.writeValueAsString(bookingDto))
+                   .characterEncoding(StandardCharsets.UTF_8)
+                   .contentType(MediaType.APPLICATION_JSON)
+                   .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isBadRequest());
     }
 
     @Test

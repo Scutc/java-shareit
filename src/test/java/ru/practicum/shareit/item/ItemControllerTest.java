@@ -10,6 +10,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.config.ItemControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
+import ru.practicum.shareit.exception.ErrorHandler;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.NotAllowedToChangeException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -29,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({ItemController.class, ItemControllerTestConfig.class, WebConfig.class})
+@SpringJUnitWebConfig({ItemController.class, ItemControllerTestConfig.class, WebConfig.class, ErrorHandler.class})
 public class ItemControllerTest {
     @Mock
     private IItemService itemService;
@@ -47,7 +50,7 @@ public class ItemControllerTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
-                .standaloneSetup(controller)
+                .standaloneSetup(new ErrorHandler(), controller)
                 .build();
 
         itemDto = new ItemDto(1L, "Item1", "Nice Item", true, 1L, null);
@@ -66,6 +69,11 @@ public class ItemControllerTest {
            .andExpect(jsonPath("$.name", is(itemDtoResponse.getName())))
            .andExpect(jsonPath("$.description", is(itemDtoResponse.getDescription())))
            .andExpect(jsonPath("$.available", is(itemDtoResponse.getAvailable())));
+
+        when(itemService.getItemById(any(), any()))
+                .thenThrow(ItemNotFoundException.class);
+        mvc.perform(get("/items/1").header("X-Sharer-User-Id", 1L))
+           .andExpect(status().isNotFound());
     }
 
     @Test
@@ -143,5 +151,15 @@ public class ItemControllerTest {
            .andExpect(status().isOk())
            .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
            .andExpect(jsonPath("$.text", is(commentDto.getText())));
+
+        when(itemService.addComment(any(), any(), any()))
+                .thenThrow(NotAllowedToChangeException.class);
+        mvc.perform(post("/items/1/comment")
+                   .header("X-Sharer-User-Id", 1L)
+                   .content(mapper.writeValueAsString(commentDto))
+                   .characterEncoding(StandardCharsets.UTF_8)
+                   .contentType(MediaType.APPLICATION_JSON)
+                   .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isBadRequest());
     }
 }

@@ -3,6 +3,8 @@ package ru.practicum.shareit.request;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import ru.practicum.shareit.config.RequestControllerTestConfig;
 import ru.practicum.shareit.config.WebConfig;
+import ru.practicum.shareit.exception.ErrorHandler;
+import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.request.controller.RequestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig({RequestController.class, RequestControllerTestConfig.class, WebConfig.class})
+@SpringJUnitWebConfig({RequestController.class, RequestControllerTestConfig.class, WebConfig.class, ErrorHandler.class})
 public class RequestControllerTest {
     @Mock
     private IRequestService requestService;
@@ -46,7 +48,7 @@ public class RequestControllerTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
-                .standaloneSetup(controller)
+                .standaloneSetup(new ErrorHandler(), controller)
                 .build();
 
         requestDto = new RequestDto(1L, "description");
@@ -78,6 +80,12 @@ public class RequestControllerTest {
            .andExpect(jsonPath("$", hasSize(1)))
            .andExpect(jsonPath("$[0].id", is(requestDtoForResponse.getId()), Long.class))
            .andExpect(jsonPath("$[0].description", is(requestDtoForResponse.getDescription())));
+
+        when(requestService.findRequestByRequestorId(any()))
+                .thenThrow(RequestNotFoundException.class);
+
+        mvc.perform(get("/requests").header("X-Sharer-User-Id", 1L))
+           .andExpect(status().isNotFound());
     }
 
     @Test
