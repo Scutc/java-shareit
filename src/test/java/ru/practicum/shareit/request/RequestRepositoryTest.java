@@ -34,8 +34,6 @@ public class RequestRepositoryTest {
 
     @Test
     void findRequestByRequestorIdTest() {
-        EntityManager entityManager = em.getEntityManager();
-
         User user = new User(1L, "User1", "user1@email.com");
         user = userRepository.save(user);
         Item item = new Item(1L, "Item1", "drill for construction", true, user.getId(), null);
@@ -47,6 +45,6 @@ public class RequestRepositoryTest {
                                       .createQuery("Select r from Request r where r.requestor.id = :id", Request.class);
         Request request1 = query.setParameter("id", request.getRequestor().getId()).getSingleResult();
         assertTrue(requestRepository.findRequestByRequestor_Id(request.getRequestor().getId()).get(0).getId()
-                                    .equals(request1.getRequestor().getId()));
+                                    .equals(request1.getId()));
     }
 }
