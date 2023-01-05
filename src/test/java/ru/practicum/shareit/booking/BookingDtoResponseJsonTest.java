@@ -14,9 +14,8 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
+@JsonTest
 public class BookingDtoResponseJsonTest {
-/*
     @Autowired
     private JacksonTester<BookingDtoResponse> json;
 
@@ -47,5 +46,5 @@ public class BookingDtoResponseJsonTest {
                 "APPROVED\",\"booker\":{\"id\":5,\"name\":\"User1\",\"email\":\"user@email.com\"},\"item\":{\"id\":7," +
                 "\"name\":\"Item\",\"description\":\"best item\",\"available\":true,\"ownerId\":5}}";
         assertThat(json.parse(jsonValue).equals(expected));
-    }*/
+    }
 }

@@ -55,7 +55,7 @@ public class ItemMapper {
                 itemDto.getUserId(), null);
     }
 
-    public static ItemDtoResponseForRequest toItemDtoResponseForRequest (Item item) {
+    public static ItemDtoResponseForRequest toItemDtoResponseForRequest(Item item) {
         ItemDtoResponseForRequest itemForResponse = new ItemDtoResponseForRequest(item.getId(),
                 item.getName(),
                 item.getDescription(),

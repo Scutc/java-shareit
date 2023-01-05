@@ -94,7 +94,7 @@ public class BookingServiceImpl implements IBookingService {
     public List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(userId);
         Pageable pageable = paginationConverter.convert(from, size, "start");
-        if (!pageable.isUnpaged() ) {
+        if (!pageable.isUnpaged()) {
             List<Booking> bookings = bookingRepository.findByBookerId(userId, pageable).toList();
             return makeListOfBookingDtoResponse(bookings);
         }
