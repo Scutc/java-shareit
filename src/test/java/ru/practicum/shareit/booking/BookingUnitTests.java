@@ -6,39 +6,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.service.BookingMapper;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.booking.service.IBookingService;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.item.dao.CommentRepository;
-import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.IItemService;
-import ru.practicum.shareit.item.service.ItemMapper;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.request.dao.RequestRepository;
-import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.IUserService;
-import ru.practicum.shareit.user.service.UserMapper;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utility.PaginationConverter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -75,10 +60,10 @@ public class BookingUnitTests {
         user = new User(1L, "User1", "user1@mail.com");
         userDto = new UserDto(user.getId(), user.getName(), user.getEmail());
         itemDto = new ItemDto(1L, "Item1", "Description1", true, 2L, null);
-        item = new Item(itemDto.getId(), itemDto.getName(), itemDto.getDescription(),itemDto.getAvailable(),
+        item = new Item(itemDto.getId(), itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(),
                 itemDto.getUserId(), null);
         bookingService = new BookingServiceImpl(bookingRepository, itemService, userService, new PaginationConverter());
-        bookingDto = new BookingDto(1L,LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(5),
+        bookingDto = new BookingDto(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(5),
                 BookingStatus.WAITING, 1L, 1L);
         booking = new Booking(bookingDto.getId(), bookingDto.getStart(), bookingDto.getEnd(),
                 bookingDto.getBookingStatus(), null, null);
@@ -89,28 +74,33 @@ public class BookingUnitTests {
                 itemDto.getAvailable(), null, null, null, 2L);
     }
 
-
     @Test
     void createBookingTest() {
         Mockito
                 .when(itemService.getItemById(anyLong(), anyLong()))
-                        .thenReturn(itemDtoResponse);
+                .thenReturn(itemDtoResponse);
 
         Mockito
                 .when(bookingRepository.save(any()))
-                        .thenReturn(booking);
+                .thenReturn(booking);
 
         Mockito
                 .when(userService.getUserById(any()))
-                        .thenReturn(userDto);
+                .thenReturn(userDto);
 
         assertThat(bookingService.createBooking(1L, bookingDto) != null);
 
         itemDtoResponse.setUserId(1L);
-        assertThrows(EntityNotFoundException.class, ()-> bookingService.createBooking(1L, bookingDto));
+        assertThrows(EntityNotFoundException.class, () -> bookingService.createBooking(1L, bookingDto));
 
         bookingDto.setStart(LocalDateTime.now().minusDays(1));
-        assertThrows(NotValidDateException.class, ()-> bookingService.createBooking(1L, bookingDto));
+        assertThrows(NotValidDateException.class, () -> bookingService.createBooking(1L, bookingDto));
+
+        itemDtoResponse.setAvailable(false);
+        Mockito
+                .when(itemService.getItemById(anyLong(), anyLong()))
+                .thenReturn(itemDtoResponse);
+        assertThrows(NotAvailableException.class, () -> bookingService.createBooking(1L, bookingDto));
     }
 
     @Test
@@ -119,7 +109,7 @@ public class BookingUnitTests {
                 .when(bookingRepository.findBookingById(any(), any()))
                 .thenReturn(null);
 
-        assertThrows(NotAllowedToChangeException.class, ()-> bookingService.updateBookingStatus(1L, 1L,
+        assertThrows(NotAllowedToChangeException.class, () -> bookingService.updateBookingStatus(1L, 1L,
                 true));
 
         Mockito
@@ -128,7 +118,7 @@ public class BookingUnitTests {
         Mockito
                 .when(bookingRepository.findBookingByIdOwner(any(), any()))
                 .thenReturn(null);
-        assertThrows(EntityNotFoundException.class, ()-> bookingService.updateBookingStatus(1L, 1L,
+        assertThrows(EntityNotFoundException.class, () -> bookingService.updateBookingStatus(1L, 1L,
                 true));
 
 
@@ -137,7 +127,7 @@ public class BookingUnitTests {
                 .when(bookingRepository.findBookingByIdOwner(any(), any()))
                 .thenReturn(booking);
 
-        assertThrows(NotAllowedToChangeException.class, ()-> bookingService.updateBookingStatus(1L, 1L,
+        assertThrows(NotAllowedToChangeException.class, () -> bookingService.updateBookingStatus(1L, 1L,
                 true));
 
 
@@ -150,7 +140,7 @@ public class BookingUnitTests {
                 .thenReturn(booking);
         Mockito
                 .when(bookingRepository.save(any()))
-                        .thenReturn(booking);
+                .thenReturn(booking);
 
 
         assertThat(bookingService.updateBookingStatus(1L, 1L, true)
@@ -163,15 +153,15 @@ public class BookingUnitTests {
     @Test
     void getBookingByIdTest() {
         Mockito
-                .when(bookingRepository.findBookingById(any(),any()))
+                .when(bookingRepository.findBookingById(any(), any()))
                 .thenReturn(booking);
 
         assertNotNull(bookingService.getBookingById(1L, 1L));
 
         Mockito
-                .when(bookingRepository.findBookingById(any(),any()))
+                .when(bookingRepository.findBookingById(any(), any()))
                 .thenReturn(null);
-        assertThrows(EntityNotFoundException.class,() ->bookingService.getBookingById(1L, 1L));
+        assertThrows(EntityNotFoundException.class, () -> bookingService.getBookingById(1L, 1L));
     }
 
     @Test
@@ -181,7 +171,7 @@ public class BookingUnitTests {
                 .thenReturn(userDto);
 
         assertThrows(UnsupportedStatusException.class, () ->
-                bookingService.getBookingsByUser(1L, "Unsupported",null,null));
+                bookingService.getBookingsByUser(1L, "Unsupported", null, null));
 
         Mockito
                 .when(bookingRepository.findBookingsByBooker(any()))
@@ -219,7 +209,7 @@ public class BookingUnitTests {
                 .thenReturn(userDto);
 
         assertThrows(UnsupportedStatusException.class, () ->
-                bookingService.getBookingByOwner(1L, "Unsupported",null,null));
+                bookingService.getBookingByOwner(1L, "Unsupported", null, null));
 
         Mockito
                 .when(bookingRepository.findBookingByOwner(any()))
