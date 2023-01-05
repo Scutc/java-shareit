@@ -1,10 +1,8 @@
 package ru.practicum.shareit.utility;
 
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.exception.NotValidDateException;
 import ru.practicum.shareit.exception.NotValidParamsException;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,7 +12,7 @@ public class PaginationConverterTests {
 
     @Test
     void convertTest() {
-        assertThrows(NotValidParamsException.class, () ->  paginationConverter.convert(0, -1, null));
+        assertThrows(NotValidParamsException.class, () -> paginationConverter.convert(0, -1, null));
 
         assertNotNull(paginationConverter.convert(0, 2, null));
 
