@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
@@ -9,9 +7,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
@@ -155,7 +150,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getAllBookingsTestException () throws Exception {
+    void getAllBookingsTestException() throws Exception {
         when(bookingService.getBookingsByUser(any(), any(), any(), any()))
                 .thenThrow(new UnsupportedStatusException("STATUSBAD"));
         mvc.perform(get("/bookings").header("X-Sharer-User-Id", 1L))
@@ -163,7 +158,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getAllBookingsTestException2 () throws Exception {
+    void getAllBookingsTestException2() throws Exception {
         when(bookingService.getBookingsByUser(any(), any(), any(), any()))
                 .thenThrow(NotValidParamsException.class);
         mvc.perform(get("/bookings").header("X-Sharer-User-Id", 1L))
