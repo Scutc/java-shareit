@@ -19,8 +19,6 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static ru.practicum.shareit.user.service.UserMapper.toUser;
-import static ru.practicum.shareit.user.service.UserMapper.toUserDto;
 
 @ExtendWith(MockitoExtension.class)
 public class UserUnitTest {
