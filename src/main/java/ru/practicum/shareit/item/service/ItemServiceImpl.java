@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dao.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.IUserService;
 import ru.practicum.shareit.user.service.UserMapper;
@@ -38,6 +39,7 @@ public class ItemServiceImpl implements IItemService {
     private final IUserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     public ItemDtoResponse getItemById(Long itemId, Long ownerId) {
@@ -84,6 +86,7 @@ public class ItemServiceImpl implements IItemService {
         userService.getUserById(userId);
         itemDto.setUserId(userId);
         Item item = itemRepository.save(toItem(itemDto));
+        item.setRequest(requestRepository.findRequestById(itemDto.getRequestId()));
         return toItemDto(item);
     }
 

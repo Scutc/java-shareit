@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 
-
 public class BookingMapper {
     public static Booking toBooking(BookingDto bookingDto) {
         return new Booking(bookingDto.getId(),

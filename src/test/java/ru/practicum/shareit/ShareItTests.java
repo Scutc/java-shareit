@@ -14,6 +14,9 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.IItemService;
+import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoForResponse;
+import ru.practicum.shareit.request.service.IRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.IUserService;
 
@@ -35,6 +38,9 @@ class ShareItTests {
 
     @Autowired
     IItemService itemService;
+
+    @Autowired
+    IRequestService requestService;
 
     @Test
     void contextLoads() {
@@ -60,12 +66,34 @@ class ShareItTests {
     }
 
     @Test
+    void createUserWithDuplicate() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        UserDto userDto1 = userService.createUser(userDto);
+        assertThat(userDto1 == null);
+        assertThat(userDto != null);
+    }
+
+    @Test
+    void createBookingWithNoUser() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        Long userId = userDto.getId();
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
+        itemDto = itemService.createItem(userId, itemDto);
+        Long itemId = itemDto.getId();
+
+        BookingDto bookingDto = new BookingDto(0L, LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2), BookingStatus.WAITING, 99L, itemId);
+        assertThrows(UserNotFoundException.class, () -> bookingService.createBooking(99L, bookingDto));
+    }
+
+    @Test
     void createGetUpdateItemTest() {
         UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
         userDto = userService.createUser(userDto);
         Long userId = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
         assertThat(itemService.getItemById(itemId, userId).getName().equals("Item1"));
@@ -84,7 +112,7 @@ class ShareItTests {
         userDto = userService.createUser(userDto);
         Long userId1 = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
 
@@ -108,7 +136,7 @@ class ShareItTests {
         userDto = userService.createUser(userDto);
         Long userId1 = userDto.getId();
 
-        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId);
+        ItemDto itemDto = new ItemDto(0L, "Item1", "Description", true, userId, null);
         itemDto = itemService.createItem(userId, itemDto);
         Long itemId = itemDto.getId();
 
@@ -124,5 +152,14 @@ class ShareItTests {
         itemService.addComment(commentDto, userId1, itemDto.getId());
 
         assertThat(itemService.getItemById(itemDto.getId(), userId1).getComments().size() == 1);
+    }
+
+    @Test
+    void createRequest() {
+        UserDto userDto = new UserDto(0L, "User1", "user1@gmail.com");
+        userDto = userService.createUser(userDto);
+        RequestDto requestDto = new RequestDto(userDto.getId(), "Description");
+        RequestDtoForResponse requestDtoForResponse = requestService.addRequest(requestDto, userDto.getId());
+        assertThat(requestService.getRequestById(requestDtoForResponse.getId(), userDto.getId()) != null);
     }
 }

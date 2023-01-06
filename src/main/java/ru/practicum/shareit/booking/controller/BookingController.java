@@ -44,21 +44,25 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getBookingByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId,
-                                                      @RequestParam(required = false) String state) {
+                                                      @RequestParam(required = false) String state,
+                                                      @RequestParam(required = false) Integer from,
+                                                      @RequestParam(required = false) Integer size) {
         log.info("Поступил запрос на получение списка бронирований для пользователя " + ownerId);
         if (state == null) {
             state = "ALL";
         }
-        return bookingService.getBookingByOwner(ownerId, state);
+        return bookingService.getBookingByOwner(ownerId, state, from, size);
     }
 
     @GetMapping()
     public List<BookingDtoResponse> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @RequestParam(required = false) String state) {
+                                                   @RequestParam(required = false) String state,
+                                                   @RequestParam(required = false) Integer from,
+                                                   @RequestParam(required = false) Integer size) {
         log.info("Поступил запрос на получение всех бронирований");
         if (state == null) {
             state = "ALL";
         }
-        return bookingService.getBookingsByUser(userId, state);
+        return bookingService.getBookingsByUser(userId, state, from, size);
     }
 }

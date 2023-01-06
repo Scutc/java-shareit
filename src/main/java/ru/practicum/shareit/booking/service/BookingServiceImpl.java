@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.item.service.ItemMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.IUserService;
 import ru.practicum.shareit.user.service.UserMapper;
+import ru.practicum.shareit.utility.PaginationConverter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,7 @@ public class BookingServiceImpl implements IBookingService {
     private final BookingRepository bookingRepository;
     private final IItemService itemService;
     private final IUserService userService;
+    private final PaginationConverter paginationConverter;
 
     @Transactional
     @Override
@@ -88,8 +91,13 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getBookingsByUser(Long userId, String state) throws UserNotFoundException {
+    public List<BookingDtoResponse> getBookingsByUser(Long userId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(userId);
+        Pageable pageable = paginationConverter.convert(from, size, "start");
+        if (!pageable.isUnpaged()) {
+            List<Booking> bookings = bookingRepository.findByBookerId(userId, pageable).toList();
+            return makeListOfBookingDtoResponse(bookings);
+        }
         switch (state) {
             case "ALL":
                 return makeListOfBookingDtoResponse(bookingRepository.findBookingsByBooker(userId));
@@ -115,8 +123,13 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getBookingByOwner(Long ownerId, String state) throws UserNotFoundException {
+    public List<BookingDtoResponse> getBookingByOwner(Long ownerId, String state, Integer from, Integer size) throws UserNotFoundException {
         userService.getUserById(ownerId);
+        Pageable pageable = paginationConverter.convert(from, size, "start");
+        if (!pageable.isUnpaged()) {
+            List<Booking> bookings = bookingRepository.findByOwnerId(ownerId, pageable).toList();
+            return makeListOfBookingDtoResponse(bookings);
+        }
         switch (state) {
             case "ALL":
                 return makeListOfBookingDtoResponse(bookingRepository.findBookingByOwner(ownerId));
